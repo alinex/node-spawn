@@ -1,17 +1,30 @@
-Package: undefined
+Package: alinex-spawn
 =================================================
 
-[![Build Status] (https://travis-ci.org/alinex/node-spawn.svg?branch=master)](https://travis-ci.org/alinex/node-spawn) 
+[![Build Status] (https://travis-ci.org/alinex/node-spawn.svg?branch=master)](https://travis-ci.org/alinex/node-spawn)
 [![Coverage Status] (https://coveralls.io/repos/alinex/node-spawn/badge.png?branch=master)](https://coveralls.io/r/alinex/node-spawn?branch=master)
 [![Dependency Status] (https://gemnasium.com/alinex/node-spawn.png)](https://gemnasium.com/alinex/node-spawn)
 
-Description comes here...
+This is an object oriented implementation around the core `process.spawn`
+command. It's benefits are:
+
+- automatic error control
+- automatic retry in case of error
+- automatic delying in case of high server load
+- completely adjustable
+
+It is one of the modules of the [Alinex Universe](http://alinex.github.io/node-alinex)
+following the code standards defined there.
 
 
 Install
 -------------------------------------------------
 
-[![NPM](https://nodei.co/npm/undefined.png?downloads=true&stars=true)](https://nodei.co/npm/undefined/)
+The easiest way is to let npm add the module directly:
+
+    > npm install alinex-spawn --save
+
+[![NPM](https://nodei.co/npm/alinex-spawn.png?downloads=true&stars=true)](https://nodei.co/npm/alinex-spawn/)
 
 
 License
