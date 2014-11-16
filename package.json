@@ -26,9 +26,13 @@
   "directories": {
     "lib": "./lib"
   },
-  "dependencies": {},
+  "dependencies": {
+    "debug": "2.x"
+  },
   "devDependencies": {
-    "alinex-make": "0.2.x"
+    "alinex-error": "^0.2.6",
+    "alinex-make": "0.4.x",
+    "chai": "^1.10.0"
   },
   "optionalDependencies": {},
   "engines": {

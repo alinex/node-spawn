@@ -22,10 +22,10 @@ class Spawn
   stdin = ''
   stdout = ''
   stderr = ''
-  start
-  date
-  code
-  error
+  start = null
+  date = null
+  code = null
+  error = null
 
   run: ->
   kill: ->
