@@ -20,7 +20,9 @@ class Spawn extends EventEmitter
 
   constructor: (@config) ->
     unless @config.check
-      @config.check = (proc) -> proc.code? and proc.code is 0
+      @config.check = (proc) ->
+        unless proc.code? and proc.code is 0
+          new Error "Got exit code of #{proc.code}."
 
   run: (cb) ->
     unless @config.cmd
@@ -39,7 +41,7 @@ class Spawn extends EventEmitter
       uid: @config.uid
       gif: @config.gid
     @pid = proc.pid
-    debug "[#{@pid}] #{@config.cmd} #{(args ? []).join ' '}"
+    debug "[#{@pid}] #{@config.cmd} #{(@config.args ? []).join ' '}"
     # collect output
     stdout = stderr = ''
     proc.stdout.setEncoding "utf8"
@@ -79,18 +81,18 @@ class Spawn extends EventEmitter
     # error management
     proc.on 'error', (@err) =>
       bufferClean()
+      @error = err
       @emit 'error', err
       debug chalk.red "[#{proc.pid}] #{err.toString()}"
     # process finished
     proc.on 'close', (@code) =>
       @end = new Date
       bufferClean()
-      debug "[#{proc.pid}] exit: #{@code}"
+      debug "[#{proc.pid}] exit: #{@code} after #{@end-@start}ms"
       @emit 'done', @code
+      @error = @config.check @
       if cb
         cb @error, @stdout, @stderr, @code
-
-  success: -> @config.check @
 
 
 module.exports = Spawn

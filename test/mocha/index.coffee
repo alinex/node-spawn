@@ -55,10 +55,3 @@ describe "Spawn wrapper", ->
         expect(proc.code, 'exit code').to.equal 0
         done()
 
-    it "should succeed afterwards", (done) ->
-      proc = new Spawn
-        cmd: 'date'
-      proc.run ->
-        expect(proc.success(), 'success').to.be.true
-        done()
-
