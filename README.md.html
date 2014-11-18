@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>README.md</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="doc-style.css" />
+  <script src="doc-filelist.js"></script>
+  <script>
+    var relativeDir = "", thisFile = "home/alex/a3/node-spawn/READMEmd", defaultSidebar = true;
+  </script>
+  <script src="doc-script.js"></script>
+  <script src="fileSearch.js"></script>
+  <script src="goToLine.js"></script>
+  <link rel="stylesheet" href="fileSearch.css" />
+  <link rel="stylesheet" href="goToLine.css" />
+</head>
+<body>
+  <div id="sidebar_wrapper">
+    <div id="sidebar_switch">
+      <span class="tree">Files</span>
+      <span class="headings">Headings</span>
+    </div>
+    <div id="tree"></div>
+    <div id="headings">
+      <div class="heading h1">
+        <a href="#package%3A%20alinex-spawn">Package: alinex-spawn</a>
+      </div>
+      <div class="heading h2">
+        <a href="#install">Install</a>
+      </div>
+      <div class="heading h2">
+        <a href="#usage">Usage</a>
+      </div>
+      <div class="heading h3">
+        <a href="#run%20with%20callback">Run with Callback</a>
+      </div>
+      <div class="heading h3">
+        <a href="#run%20using%20events">Run using Events</a>
+      </div>
+      <div class="heading h3">
+        <a href="#check%20for%20success">Check for Success</a>
+      </div>
+      <div class="heading h2">
+        <a href="#api">API</a>
+      </div>
+      <div class="heading h3">
+        <a href="#global%20functions">Global functions</a>
+      </div>
+      <div class="heading h3">
+        <a href="#instantiate">Instantiate</a>
+      </div>
+      <div class="heading h3">
+        <a href="#methods">Methods</a>
+      </div>
+      <div class="heading h3">
+        <a href="#properties">Properties</a>
+      </div>
+      <div class="heading h3">
+        <a href="#events">Events</a>
+      </div>
+      <div class="heading h2">
+        <a href="#license">License</a>
+      </div>
+    </div>
+  </div>
+  <div id="sidebar-toggle"></div>
+  <div id="container"><a id="fork" href="https://github.com/alinex/node-spawn" title="Fork me on GitHub"></a><div class="docs markdown">
+<div class="pilwrap" id="package%3A%20alinex-spawn">
+  <h1>
+    <a href="#package%3A%20alinex-spawn" name="package%3A%20alinex-spawn" class="pilcrow">&#182;</a>
+    Package: alinex-spawn
+  </h1>
+</div>
+
+
+<p><a href="https://travis-ci.org/alinex/node-spawn"><img src="https://travis-ci.org/alinex/node-spawn.svg?branch=master" alt="Build Status" title="" /></a>
+<a href="https://coveralls.io/r/alinex/node-spawn?branch=master"><img src="https://coveralls.io/repos/alinex/node-spawn/badge.png?branch=master" alt="Coverage Status" title="" /></a>
+<a href="https://gemnasium.com/alinex/node-spawn"><img src="https://gemnasium.com/alinex/node-spawn.png" alt="Dependency Status" title="" /></a></p>
+
+<p>This is an object oriented implementation around the core <code>process.spawn</code>
+command. It's benefits are:</p>
+
+<ul>
+<li>automatic error control</li>
+<li>automatic retry in case of error</li>
+<li>automatic delaying in case of high server load</li>
+<li>completely adjustable</li>
+<li>use priorities (also on OS level)</li>
+</ul>
+
+<p>It is one of the modules of the <a href="http://alinex.github.io/node-alinex.html">Alinex Universe</a>
+following the code standards defined there.</p>
+
+
+<div class="pilwrap" id="install">
+  <h2>
+    <a href="#install" name="install" class="pilcrow">&#182;</a>
+    Install
+  </h2>
+</div>
+
+
+<p>The easiest way is to let npm add the module directly:</p>
+
+
+<div class="highlight"><pre><code><span class="o">&gt;</span> <span class="nx">npm</span> <span class="nx">install</span> <span class="nx">alinex</span><span class="o">-</span><span class="nx">spawn</span> <span class="o">--</span><span class="nx">save</span>
+</code></pre></div>
+
+
+
+<p><a href="https://nodei.co/npm/alinex-spawn/"><img src="https://nodei.co/npm/alinex-spawn.png?downloads=true&amp;stars=true" alt="NPM" title="" /></a></p>
+
+
+<div class="pilwrap" id="usage">
+  <h2>
+    <a href="#usage" name="usage" class="pilcrow">&#182;</a>
+    Usage
+  </h2>
+</div>
+
+
+<p>You may connect to the process using a callback method on the <code>run()</code> call or
+use the events.</p>
+
+<p>First you have to load the class package.</p>
+
+
+<div class="highlight"><pre><code><span class="nx">Spawn</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;alinex-spawn&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+
+
+<p>Now you may setup an external process like:</p>
+
+
+<div class="highlight"><pre><code><span class="nx">proc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Spawn</span> <span class="p">{</span>
+  <span class="nx">cmd</span><span class="o">:</span> <span class="s1">&#39;date&#39;</span>
+<span class="p">};</span>
+</code></pre></div>
+
+
+
+<p>You may also change the configuration afterwards like:</p>
+
+
+<div class="highlight"><pre><code><span class="nx">proc</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">cmd</span> <span class="o">=</span> <span class="s1">&#39;date&#39;</span><span class="p">;</span>
+</code></pre></div>
+
+
+
+<p>Now you have multiple ways to work and control your process.</p>
+
+
+<div class="pilwrap" id="run%20with%20callback">
+  <h3>
+    <a href="#run%20with%20callback" name="run%20with%20callback" class="pilcrow">&#182;</a>
+    Run with Callback
+  </h3>
+</div>
+
+
+<p>To run this simple process call the run-method:</p>
+
+
+<div class="highlight"><pre><code><span class="nx">proc</span><span class="p">.</span><span class="nx">run</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">stdout</span><span class="p">,</span> <span class="nx">stderr</span><span class="p">,</span> <span class="nx">code</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// work with the results</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+
+<p>After the process has completed its task the callback will be called with the
+most used data. But you may access all details through the <code>proc</code> object.</p>
+
+
+<div class="pilwrap" id="run%20using%20events">
+  <h3>
+    <a href="#run%20using%20events" name="run%20using%20events" class="pilcrow">&#182;</a>
+    Run using Events
+  </h3>
+</div>
+
+
+<p>With events you can monitor what's going on while the process works.</p>
+
+
+<div class="highlight"><pre><code><span class="nx">proc</span><span class="p">.</span><span class="nx">run</span><span class="p">();</span>
+
+<span class="nx">stdout</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+<span class="nx">proc</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;stdout&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">stdout</span> <span class="o">+=</span> <span class="nx">data</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="nx">proc</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;done&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// analyse the results</span>
+<span class="p">});</span>
+</code></pre></div>
+
+
+
+
+<div class="pilwrap" id="check%20for%20success">
+  <h3>
+    <a href="#check%20for%20success" name="check%20for%20success" class="pilcrow">&#182;</a>
+    Check for Success
+  </h3>
+</div>
+
+
+<p>You may give a check method in the configuration which will be used to check
+whether the process succeeded:</p>
+
+
+<div class="highlight"><pre><code><span class="nx">proc</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">check</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">proc</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span><span class="nx">proc</span><span class="p">.</span><span class="nx">code</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">code</span> <span class="o">===</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+
+
+
+<p>The above given check function is the default if nothing set.</p>
+
+<p>Now after the process finished you may check for the success (this will use the
+previously given check function):</p>
+
+
+<div class="highlight"><pre><code><span class="k">if</span> <span class="p">(</span><span class="nx">proc</span><span class="p">.</span><span class="nx">success</span><span class="p">())</span> <span class="p">{</span>
+  <span class="c1">// do something</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+
+
+<div class="pilwrap" id="api">
+  <h2>
+    <a href="#api" name="api" class="pilcrow">&#182;</a>
+    API
+  </h2>
+</div>
+
+
+
+<div class="pilwrap" id="global%20functions">
+  <h3>
+    <a href="#global%20functions" name="global%20functions" class="pilcrow">&#182;</a>
+    Global functions
+  </h3>
+</div>
+
+
+
+<div class="pilwrap" id="instantiate">
+  <h3>
+    <a href="#instantiate" name="instantiate" class="pilcrow">&#182;</a>
+    Instantiate
+  </h3>
+</div>
+
+
+
+<div class="highlight"><pre><code><span class="k">new</span> <span class="nx">Spawn</span><span class="p">(</span><span class="nx">config</span><span class="p">);</span>
+</code></pre></div>
+
+
+
+<p>This will create a new process to be run later. You may define it directly on
+instantiation or through it's <code>config</code> property afterwards.
+A spawn instance may also be reused to run again or run with some modification
+again.</p>
+
+<p>See the <code>config</code> property below for what to be configured here.</p>
+
+
+<div class="pilwrap" id="methods">
+  <h3>
+    <a href="#methods" name="methods" class="pilcrow">&#182;</a>
+    Methods
+  </h3>
+</div>
+
+
+<ul>
+<li><code>run(cb)</code> - to start a preconfigured process</li>
+</ul>
+
+
+<div class="pilwrap" id="properties">
+  <h3>
+    <a href="#properties" name="properties" class="pilcrow">&#182;</a>
+    Properties
+  </h3>
+</div>
+
+
+<ul>
+<li><code>config</code> - setup for the process
+<ul><li>cmd (string) - the command to run</li>
+<li>args (array) - all arguments to be given to the command</li>
+<li>cwd (string) - current working directory</li>
+<li>env (object) - environment key-value pairs</li>
+<li>uid (integer) - user identity of the process</li>
+<li>gid (integer) - group identity of the process</li>
+<li>check (function) - to check whether process succeeded</li></ul></li>
+</ul>
+
+<p>Data from the last run:</p>
+
+<ul>
+<li><code>pid</code> - process pid which has been given</li>
+<li><code>start</code> - date when the process started</li>
+<li><code>end</code> - date when the process finished</li>
+<li><code>code</code> - return code of the process</li>
+<li><code>stdout</code> - output of the process</li>
+<li><code>stderr</code> - error output of the process</li>
+<li><code>error</code> - Error object if one occurred</li>
+</ul>
+
+
+<div class="pilwrap" id="events">
+  <h3>
+    <a href="#events" name="events" class="pilcrow">&#182;</a>
+    Events
+  </h3>
+</div>
+
+
+<ul>
+<li><code>error</code> (object) - if an error occurred</li>
+<li><code>stdout</code> (string) - if a line is outputted</li>
+<li><code>stderr</code> (string) - if a error line is outputted</li>
+<li><code>done</code> (integer) - if the process finished giving exit code</li>
+</ul>
+
+
+<div class="pilwrap" id="license">
+  <h2>
+    <a href="#license" name="license" class="pilcrow">&#182;</a>
+    License
+  </h2>
+</div>
+
+
+<p>Copyright 2014 Alexander Schilling</p>
+
+<p>Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+
+<blockquote>
+  <p><a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+</blockquote>
+
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p></div>
+  </div>
+</body>
+</html>
