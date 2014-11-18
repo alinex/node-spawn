@@ -27,6 +27,20 @@ describe "Spawn wrapper", ->
         expect(code, 'exit code').to.equal 0
         done()
 
+    it "should have complete result set", (done) ->
+      proc = new Spawn
+        cmd: 'date'
+      proc.run ->
+        expect(proc.pid, 'pid').to.be.above 0
+        expect(proc.start, 'start').to.be.an.instanceof Date
+        expect(proc.start, 'end').to.be.an.instanceof Date
+        expect(proc.end > proc.start, 'end after start').to.be.true
+        expect(proc.code, 'code').to.equal 0
+        expect(proc.stdout, 'standard output').to.have.length.above 0
+        expect(proc.stderr, 'error output').to.equal ''
+        expect(proc.stderr, 'error output').to.equal ''
+        done()
+
     it "should work with events", (done) ->
       proc = new Spawn
         cmd: 'date'
@@ -39,5 +53,12 @@ describe "Spawn wrapper", ->
         expect(stdout, 'standard output').to.equal proc.stdout
         expect(proc.stderr, 'error output').to.equal ''
         expect(proc.code, 'exit code').to.equal 0
+        done()
+
+    it "should succeed afterwards", (done) ->
+      proc = new Spawn
+        cmd: 'date'
+      proc.run ->
+        expect(proc.success(), 'success').to.be.true
         done()
 

@@ -43,9 +43,13 @@ Now you may setup an external process like:
       cmd: 'date'
     };
 
-Now you have multiple ways to work and controll your process.
+You may also change the configuration afterwards like:
 
-### Using callback
+    proc.config.cmd = 'date';
+
+Now you have multiple ways to work and control your process.
+
+### Run with Callback
 
 To run this simple process call the run-method:
 
@@ -56,7 +60,7 @@ To run this simple process call the run-method:
 After the process has completed its task the callback will be called with the
 most used data. But you may access all details through the `proc` object.
 
-### Using events
+### Run using Events
 
 With events you can monitor what's going on while the process works.
 
@@ -70,6 +74,24 @@ With events you can monitor what's going on while the process works.
     proc.on('done', function() {
       // analyse the results
     });
+
+### Check for Success
+
+You may give a check method in the configuration which will be used to check
+whether the process succeeded:
+
+    proc.config.check = function(proc) {
+      return (proc.code != null) && proc.code === 0;
+    };
+
+The above given check function is the default if nothing set.
+
+Now after the process finished you may check for the success (this will use the
+previously given check function):
+
+    if (proc.success()) {
+      // do something
+    }
 
 
 API
@@ -101,6 +123,7 @@ See the `config` property below for what to be configured here.
   - env (object) - environment key-value pairs
   - uid (integer) - user identity of the process
   - gid (integer) - group identity of the process
+  - check (function) - to check whether process succeeded
 
 Data from the last run:
 

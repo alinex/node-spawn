@@ -19,6 +19,8 @@ class Spawn extends EventEmitter
   @loadcheck = ->
 
   constructor: (@config) ->
+    unless @config.check
+      @config.check = (proc) -> proc.code? and proc.code is 0
 
   run: (cb) ->
     unless @config.cmd
@@ -88,7 +90,7 @@ class Spawn extends EventEmitter
       if cb
         cb @error, @stdout, @stderr, @code
 
+  success: -> @config.check @
 
-  kill: ->
 
 module.exports = Spawn
