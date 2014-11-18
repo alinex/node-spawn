@@ -78,19 +78,21 @@ With events you can monitor what's going on while the process works.
 ### Check for Success
 
 You may give a check method in the configuration which will be used to check
-whether the process succeeded:
+whether the process succeeded and return an Error or undefined:
 
     proc.config.check = function(proc) {
-      return (proc.code != null) && proc.code === 0;
+      if (!((proc.code != null) && proc.code === 0)) {
+        return new Error("Got exit code of " + proc.code + ".");
+      }
     };
 
 The above given check function is the default if nothing set.
 
-Now after the process finished you may check for the success (this will use the
-previously given check function):
+This check will automatically be called on normal process close. If you want to
+know if it got an error you can use the event or callback value or check for:
 
-    if (proc.success()) {
-      // do something
+    if (proc.error != null) {
+      // something went wrong
     }
 
 
