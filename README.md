@@ -99,7 +99,9 @@ know if it got an error you can use the event or callback value or check for:
 API
 -------------------------------------------------
 
-### Global functions
+### Global setup
+
+- `LOAD` (integer) - specifies
 
 ### Instantiate
 
@@ -126,6 +128,7 @@ See the `config` property below for what to be configured here.
   - uid (integer) - user identity of the process
   - gid (integer) - group identity of the process
   - check (function) - to check whether process succeeded
+  - priority (float) - between 0..1
 
 Data from the last run:
 
