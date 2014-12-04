@@ -51,7 +51,7 @@ class Spawn extends EventEmitter
 
   # ### Timeout
   # This gives the number of milliseconds to wait
-  @loadtimeout: (p) -> (59 * (1 - p) + 1) * QWAIT * 1000
+  @loadtimeout: (p) -> (59 * (1 - p) + 1) * @WAIT * 1000
 
   # Instance methods
   # -------------------------------------------------
