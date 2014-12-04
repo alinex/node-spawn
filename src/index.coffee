@@ -15,25 +15,22 @@ os = require 'os'
 path = require 'path'
 # include alinex modules
 
-# General setup
-# -------------------------------------------------
-# This maybe changed per machine.
-LOAD = 1 # default priority run till load of 1
-WAIT = 10 # wait between 10s and 10m
-# The weight which can be started per each second
-WEIGHTLIMIT = 1000
-WEIGHT =
-  DEFAULT: 10
-  media: 500
-  ffmpeg: 500
-  SITMarkAVMultiContainerFFmpeg: 500
-  SITMarkAudioAPEmbedderCLI: 1000
-  SITMarkAudioMP3Container: 100
-  SITMarkAudioAPDetectorCLI: 1000
 
 # Class definition
 # -------------------------------------------------
 class Spawn extends EventEmitter
+
+  # Machine setup
+  # -------------------------------------------------
+  # This maybe changed per machine.
+  @LOAD: 1 # default priority run till load of 1
+  @WAIT: 10 # wait between 10s and 10m
+  # The weight which can be started per each second
+  @WEIGHTLIMIT: 1000
+  @WEIGHT:
+    DEFAULT: 10
+    ffmpeg: 500
+    lame: 500
 
   # default values
   @priority: 0.3   # default priority if none given
@@ -46,7 +43,7 @@ class Spawn extends EventEmitter
   # ### Get load limit
   # returns the load limit (between 0.8 and 4.0 with LOAD=1) the curve
   # is strong exponential, meaning higher priorities are higher load values allowed
-  @load: (p) -> (3.2 * Math.pow((Math.exp(p)-1)/(Math.E-1),2) + 0.8) * LOAD
+  @load: (p) -> (3.2 * Math.pow((Math.exp(p)-1)/(Math.E-1),2) + 0.8) * @LOAD
 
   # ### Priority Up
   # This method updates the priority before a timeout.
@@ -54,7 +51,7 @@ class Spawn extends EventEmitter
 
   # ### Timeout
   # This gives the number of milliseconds to wait
-  @loadtimeout: (p) -> (59 * (1 - p) + 1) * WAIT * 1000
+  @loadtimeout: (p) -> (59 * (1 - p) + 1) * QWAIT * 1000
 
   # Instance methods
   # -------------------------------------------------
@@ -81,13 +78,17 @@ class Spawn extends EventEmitter
         @constructor.time = ntime
         @constructor.weight = 0
       # check current weight > limit (timeout 1000)
-      if @constructor.weight > WEIGHTLIMIT
+      if @constructor.weight > @constructor.WEIGHTLIMIT
         debug "current weight to high (#{@constructor.weight}) at #{@constructor.time}, waiting..."
         @constructor.queue++
         return setTimeout (=> @loadcheck cb), 1000
       # add weight
       name = path.basename(@config.cmd)
-      @constructor.weight += if WEIGHT[name]? then WEIGHT[name] else WEIGHT.DEFAULT
+      if @constructor.WEIGHT[name]?
+        @constructor.weight += @constructor.WEIGHT[name]
+      else
+        @constructor.weight += @constructor.WEIGHT.DEFAULT
+
       debug "new weight is #{@constructor.weight} at #{@constructor.time}"
       return cb()
     # rerun check after timeout
