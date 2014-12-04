@@ -41,6 +41,7 @@ class Spawn extends EventEmitter
   # overall runtime information
   @weight: 0
   @time: null
+  @queue: 0
 
   # ### Get load limit
   # returns the load limit (between 0.8 and 4.0 with LOAD=1) the curve
@@ -49,10 +50,7 @@ class Spawn extends EventEmitter
 
   # ### Priority Up
   # This method updates the priority before a timeout.
-  @priorityup: (p) ->
-    p *= 1.1
-    return 1 if p > 1
-    p
+  @priorityup: (p) -> 1 - Math.pow 1-p, 1.1
 
   # ### Timeout
   # This gives the number of milliseconds to wait
@@ -70,6 +68,7 @@ class Spawn extends EventEmitter
 
   # ### Check if it can start
   loadcheck: (cb) =>
+    @constructor.queue--
     load = os.loadavg()[0] / os.cpus().length
     limit = @constructor.load @config.priority
     debug "current load is #{load.toFixed 2},
@@ -84,6 +83,7 @@ class Spawn extends EventEmitter
       # check current weight > limit (timeout 1000)
       if @constructor.weight > WEIGHTLIMIT
         debug "current weight to high (#{@constructor.weight}) at #{@constructor.time}, waiting..."
+        @constructor.queue++
         return setTimeout (=> @loadcheck cb), 1000
       # add weight
       name = path.basename(@config.cmd)
@@ -93,7 +93,9 @@ class Spawn extends EventEmitter
     # rerun check after timeout
     @config.priority = @constructor.priorityup @config.priority
     wait =  @constructor.loadtimeout @config.priority
+    wait += @constructor.queue*10 # add 10ms waiting time for each job in queue
     debug "wait #{~~(wait/1000)}s with process for load to go below #{@config.priority}"
+    @constructor.queue++
     setTimeout (=> @loadcheck cb), wait
 
   # ### Start the process
@@ -106,6 +108,7 @@ class Spawn extends EventEmitter
       return
     @config.priority ?= @constructor.priority
     # check system load
+    @constructor.queue++
     @loadcheck =>
       # cleanup result
       @stdout = @stderr = ''

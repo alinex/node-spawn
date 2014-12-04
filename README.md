@@ -96,6 +96,78 @@ know if it got an error you can use the event or callback value or check for:
     }
 
 
+Load handling
+-------------------------------------------------
+Starting lots and heavy processes can lead to a fully overloaded systems which
+won't really do anything.
+
+To don't get into such a situation the spawn module will check the system and
+wait for creating the new system processes till the system can handle it. All
+this have to be done prioritized.
+
+### Load checking
+
+Therefore the system will check the current system load. To get a compareable
+value the load as displayed in the `top` command will be harmonized by dividing
+it through the number of cpu cores.
+
+    load = short-load / num-cpus
+
+So a load of 1 meaning every core has to do enough in the moment, but a system
+may also have more things to do (meaning they are in the system's queue) as the
+ones just being processed.
+
+![Load Limit](src/doc/graph-load.png)
+
+Like the above graph shows the spawn module has a load `LIMIT` set per each
+machine. This specifies up to which harmonized load a process can be started.
+The graph shows how this is implemented for different priorities.
+
+The default setting for a machine in the backoffice which should run as much
+processes as possible should be 1.0 while you may use lower values if the
+system should keep fast and responsible for other things, too.
+
+### Sleep Interval
+
+If an process can't be started becuase the system load is to high and maybe his
+priority to low, it will be queued and rechecked after a timeout again. Because
+higher prioritized processes can start earlier they will be checked more
+frequently than lower priority processes.
+
+![Retry Timeout](src/doc/graph-timeout.png)
+
+The graph shows how long the interval till the next check will be for different
+`WAIT` settings. This value will set the minimum wait time in seconds and the
+maximum wait time in minutes.
+
+But to decrease the load the system will get from rechecking thousands of waiting
+processes the interval also will be 10ms longer for each already waiting process.
+This gives the system enough performance to also do the real work while rechecking
+the load.
+
+### Priority Level up
+
+To get processes which are waiting long be processed first their priority will
+slowly increase and go against the highest priority of 1.0.
+
+![Priority Up](src/doc/graph-priority.png)
+
+This causes a reduced waiting time for the next chack and higher load limits.
+
+![Time to Prio 1](src/doc/graph-timetoprio1.png)
+
+This diagram shows how long it will take for a specific process call to become
+a highest priority process while waiting in the queue with different queue lengths.
+
+### Start limit
+
+Because the load values will take some time to show the new system load based on
+just started processes the number of processes to start each second are limited.
+The system has a limit of 1000 which may be used by started processes any second.
+Each process will take 10 from this limit while special specified processes may
+take more or less.
+
+
 API
 -------------------------------------------------
 
