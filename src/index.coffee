@@ -31,7 +31,8 @@ class Spawn extends EventEmitter
   @WEIGHTTIME: 10 # time for each period in seconds
   @WEIGHTLIMIT: @WEIGHTTIME * os.cpus().length # size of load allowed for each period
 
-  # ### Specific weights for each command
+  # Specific weights for each command:
+  #
   # A weight of 1 means that it normally may be started 1/sec and cpu.
   # If you have a setting above the WEIGHTLIMIT it is started only as first
   # of a time period. Best way is to have the weights < WEIGHTLIMIT to ensure
@@ -43,6 +44,7 @@ class Spawn extends EventEmitter
 
   # default values
   @priority: 0.3   # default priority if none given
+  @retry: 5 # default number of retries
 
   # overall runtime information
   @weight: 0
@@ -126,7 +128,9 @@ class Spawn extends EventEmitter
       @emit 'error', err
       cb err if cb
       return
+    # update config
     @config.priority ?= @constructor.priority
+    @config.retry ?= @constructor.retry
     # check system load
     debug "add job #{@config.cmd} #{(@config.args ? []).join ' '}"
     @constructor.queue++
@@ -135,6 +139,7 @@ class Spawn extends EventEmitter
       # cleanup result
       @stdout = @stderr = ''
       @end = @code = @error = null
+      @retry = 0
       @start = new Date
       # create new subprocess
       nice = @constructor.nice @config.priority
@@ -189,10 +194,12 @@ class Spawn extends EventEmitter
           debugCmd chalk.grey "[#{proc.pid}] out: #{stderr}"
       # error management
       proc.on 'error', (@err) =>
+        if err.message is 'spawn EMFILE'
+          debug chalk.grey "too much processes are opened, waiting..."
+          return setTimeout (=> @run cb), 1000
         bufferClean()
         @error = err
-        @emit 'error', err
-        debugCmd chalk.red "[#{proc.pid}] #{err.toString()}"
+        retry cb
       # process finished
       proc.on 'close', (@code) =>
         @end = new Date
@@ -200,8 +207,17 @@ class Spawn extends EventEmitter
         debugCmd "[#{proc.pid}] exit: #{@code} after #{@end-@start}ms"
         @emit 'done', @code
         @error = @config.check @
-        if cb
-          cb @error, @stdout, @stderr, @code
+        return retry cb if @error
+        cb @error, @stdout, @stderr, @code if cb
+
+  # ### Retry process call after error
+  retry: (cb) ->
+    if  @retry < @config.retry
+      return setTimeout (=> @run cb), Math.exp(++@retry, 2) * 1000
+    # end of retries
+    @emit 'error', @error
+    debugCmd chalk.red "[#{@pid}] #{@error.toString()}"
+    cb @error, @stdout, @stderr, @code if cb
 
 
 module.exports = Spawn

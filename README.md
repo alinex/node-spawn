@@ -127,6 +127,17 @@ or maybe even the default priority above 1. But keep in mind that this can
 lead to a system crash. A Better Way is to set the `LOAD` setting to a high value
 of maybe 5 (will limit the system load at about 20 per cpu).
 
+### Retry on failure
+
+If a command got an error it may be called again. How often is specified in it's
+configuration `retry` or from the default `retry` setting in the class. The next
+run will start at the quadrature time in seconds (1, 4, 9, 16, 25, ... seconds).
+
+After the defined number of retries the spawn will return with an error.
+
+If the problem is the process limit it will automatically rerun after 1 second
+without counting that.
+
 
 Load handling
 -------------------------------------------------
@@ -227,9 +238,24 @@ normal system process (nice=0).
 API
 -------------------------------------------------
 
-### Global setup
+### Class setup
 
-- `LOAD` (integer) - specifies
+- `LOAD` (float) - limit system load (limit will be between 0.8*LOAD and 4*LOAD)
+- `WAIT` (float) - wait between WAIT seconds and WAIT minutes + queue size
+- `WEIGHTTIME` (float) - time for each period in seconds
+- `WEIGHTLIMIT` (float) - size of load allowed for each period
+- `WEIGHT` (object) - map of weight values for each command
+
+Default values:
+
+- `retry` (integer) - default number of retries
+- `priority` (float) - default priority
+
+### Class variables
+
+- `time` (integer) - current time period
+- `weight` (float) - already used weight in this time period
+- `queue` (integer) - number of processes in queue
 
 ### Instantiate
 
@@ -257,6 +283,18 @@ See the `config` property below for what to be configured here.
   - gid (integer) - group identity of the process
   - check (function) - to check whether process succeeded
   - priority (float) - between 0..1
+  -
+
+Runtime data
+
+- `stdout` (string) - standard output of process
+- `stderr` (string) - error output of process
+- `code` (integer) - return code (exit code)
+- `error` (Error) - error message
+- `pid` (integer) - process id
+- `start` (Date) - time of start of process
+- `end` (Date) - time of end of process
+- `retry` (integer) - number of retrys
 
 Data from the last run:
 
