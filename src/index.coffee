@@ -26,18 +26,20 @@ class Spawn extends EventEmitter
   # This maybe changed per machine.
   @LOAD: 1 # limit system load (limit will be between 0.8*LOAD and 4*LOAD)
   @WAIT: 1 # wait between WAIT seconds and WAIT minutes + queue size
+
   # The weight which can be started per each start period
   @WEIGHTTIME: 10 # time for each period in seconds
-  @WEIGHTLIMIT: 10 # size of load allowed for each period
+  @WEIGHTLIMIT: @WEIGHTTIME * os.cpus().length # size of load allowed for each period
+
   # ### Specific weights for each command
-  # A weight of 1 means that it normally may be started 1/sec.
+  # A weight of 1 means that it normally may be started 1/sec and cpu.
   # If you have a setting above the WEIGHTLIMIT it is started only as first
   # of a time period. Best way is to have the weights < WEIGHTLIMIT to ensure
   # proper priority handling.
   @WEIGHT:
-    DEFAULT: 0.1
-    ffmpeg: 5
-    lame: 5
+    DEFAULT: 0.5
+    ffmpeg: 10
+    lame: 10
 
   # default values
   @priority: 0.3   # default priority if none given
