@@ -101,17 +101,20 @@ class Spawn extends EventEmitter
         @constructor.weight + @constructor.WEIGHT.DEFAULT
       # check new weight > limit (timeout 1000)
       if @constructor.weight isnt 0 and nweight > @constructor.WEIGHTLIMIT
-        debug chalk.grey "current weight to high (#{@constructor.weight}) at #{@constructor.time}, waiting..."
+        debug chalk.grey "current weight to high (#{@constructor.weight})
+        at #{@constructor.time}, waiting..."
         @constructor.queue++
         return setTimeout (=> @loadcheck cb), 10000
       @constructor.weight = nweight
-      debug chalk.grey "current weight limit is now #{@constructor.weight} at #{@constructor.time}"
+      debug chalk.grey "current weight limit is now #{@constructor.weight}
+      at #{@constructor.time}"
       return cb()
     # rerun check after timeout
     @config.priority = @constructor.priorityup @config.priority
     wait =  @constructor.loadtimeout @config.priority
     wait += @constructor.queue*10 # add 10ms waiting time for each job in queue
-    debug chalk.grey "wait #{~~(wait/1000)}s with process for load to go below #{limit.toFixed 2}"
+    debug chalk.grey "wait #{~~(wait/1000)}s with process for load
+    to go below #{limit.toFixed 2}"
     @constructor.queue++
     setTimeout (=> @loadcheck cb), wait
 
