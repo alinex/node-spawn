@@ -60,6 +60,12 @@ class Spawn extends EventEmitter
   # This gives the number of milliseconds to wait
   @loadtimeout: (p) -> (59 * (1 - p) + 1) * @WAIT * 1000
 
+  # ### Nice value
+  # This brings the priorities to the operating system
+  @nice: (p) ->
+    v = if p > 1 then 0 else 1-p
+    ~~(v*39 - 20)
+
   # Instance methods
   # -------------------------------------------------
 
@@ -126,7 +132,14 @@ class Spawn extends EventEmitter
       @end = @code = @error = null
       @start = new Date
       # create new subprocess
-      proc = spawn @config.cmd, @config.args,
+      nice = @constructor.nice @config.priority
+#      proc = spawn @config.cmd, @config.args,
+      args = [
+        '-n', @constructor.nice @config.priority # nice setting
+        @config.cmd # command
+      ]
+      args = args.concat @config.args if @config.args?
+      proc = spawn 'nice', args,
         cwd: @config.cwd
         env: @config.env
         uid: @config.uid

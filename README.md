@@ -95,7 +95,7 @@ know if it got an error you can use the event or callback value or check for:
       // something went wrong
     }
 
-### Use load handling and priotities
+### Use load handling and priorities
 
 You don't have to do anything for load handling, it comes out of the box but you
 may customize it for your machine:
@@ -112,7 +112,7 @@ specify what the limit of processes for each start period will be.
     Spawn.WEIGHTLIMIT = 10  # size of load allowed for each period
 
 If you use non standard commands you may help the system balancing the start by
-giving each command a specific weight. Some defualt commands are already defined.
+giving each command a specific weight. Some default commands are already defined.
 
     # Specific weights for each command
     Spawn.WEIGHT.SITMarkAVMulticontainerFFmpeg = 500
@@ -139,7 +139,7 @@ this have to be done prioritized.
 
 ### Load checking
 
-Therefore the system will check the current system load. To get a compareable
+Therefore the system will check the current system load. To get a comparable
 value the load as displayed in the `top` command will be harmonized by dividing
 it through the number of cpu cores.
 
@@ -175,7 +175,7 @@ system should keep fast and responsible for other things, too.
 
 ### Sleep Interval
 
-If an process can't be started becuase the system load is to high and maybe his
+If an process can't be started because the system load is to high and maybe his
 priority to low, it will be queued and rechecked after a timeout again. Because
 higher prioritized processes can start earlier they will be checked more
 frequently than lower priority processes.
@@ -214,6 +214,14 @@ processes are allowed to be started.
 
 As an additional benefit smaller processes may be called earlier because their
 weight is low and can be added to the already high weight.
+
+### OS Priorities
+
+The process priorities will not only work for the start queue but also on the
+operating system if already running. Therefore the nice-value of each process is
+set appropriate to it's priority. That allows the operating system to give the
+processes different amount of cpu time. The range goes from 5% to 200% of the
+normal system process (nice=0).
 
 
 API
