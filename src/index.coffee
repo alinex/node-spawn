@@ -24,15 +24,20 @@ class Spawn extends EventEmitter
   # Machine setup
   # -------------------------------------------------
   # This maybe changed per machine.
-  @LOAD: 1 # default priority run till load of 1
-  @WAIT: 1 # wait between 10s and 10m
-  # The weight which can be started per each second
-  @WEIGHTLIMIT: 1000
-  @WEIGHTTIME: 10 # seconds
+  @LOAD: 1 # limit system load (limit will be between 0.8*LOAD and 4*LOAD)
+  @WAIT: 1 # wait between WAIT seconds and WAIT minutes + queue size
+  # The weight which can be started per each start period
+  @WEIGHTTIME: 10 # time for each period in seconds
+  @WEIGHTLIMIT: 10 # size of load allowed for each period
+  # ### Specific weights for each command
+  # A weight of 1 means that it normally may be started 1/sec.
+  # If you have a setting above the WEIGHTLIMIT it is started only as first
+  # of a time period. Best way is to have the weights < WEIGHTLIMIT to ensure
+  # proper priority handling.
   @WEIGHT:
-    DEFAULT: 10
-    ffmpeg: 500
-    lame: 500
+    DEFAULT: 0.1
+    ffmpeg: 5
+    lame: 5
 
   # default values
   @priority: 0.3   # default priority if none given
@@ -67,6 +72,7 @@ class Spawn extends EventEmitter
 
   # ### Check if it can start
   loadcheck: (cb) =>
+    return cb() if @config.priority > 1 # run immediately
     @constructor.queue--
     load = os.loadavg()[0] / os.cpus().length
     limit = @constructor.load @config.priority
@@ -79,17 +85,18 @@ class Spawn extends EventEmitter
       if ntime isnt @constructor.time
         @constructor.time = ntime
         @constructor.weight = 0
-      # check current weight > limit (timeout 1000)
-      if @constructor.weight > @constructor.WEIGHTLIMIT
+      # calculate new weight
+      name = path.basename(@config.cmd)
+      nweight = if @constructor.WEIGHT[name]?
+        @constructor.weight + @constructor.WEIGHT[name]
+      else
+        @constructor.weight + @constructor.WEIGHT.DEFAULT
+      # check new weight > limit (timeout 1000)
+      if @constructor.weight isnt 0 and nweight > @constructor.WEIGHTLIMIT
         debug chalk.grey "current weight to high (#{@constructor.weight}) at #{@constructor.time}, waiting..."
         @constructor.queue++
         return setTimeout (=> @loadcheck cb), 10000
-      # add weight
-      name = path.basename(@config.cmd)
-      if @constructor.WEIGHT[name]?
-        @constructor.weight += @constructor.WEIGHT[name]
-      else
-        @constructor.weight += @constructor.WEIGHT.DEFAULT
+      @constructor.weight = nweight
       debug chalk.grey "current weight limit is now #{@constructor.weight} at #{@constructor.time}"
       return cb()
     # rerun check after timeout

@@ -95,6 +95,38 @@ know if it got an error you can use the event or callback value or check for:
       // something went wrong
     }
 
+### Use load handling and priotities
+
+You don't have to do anything for load handling, it comes out of the box but you
+may customize it for your machine:
+
+    # This maybe changed per machine.
+    Spawn.LOAD = 1   # limit system load (limit will be between 0.8*LOAD and 4*LOAD)
+    Spawn.WAIT = 10  # wait between WAIT seconds and WAIT minutes + queue size
+
+See the detailed explanation below to see what each value means. Also you may
+specify what the limit of processes for each start period will be.
+
+    # The weight which can be started per each start period
+    Spawn.WEIGHTTIME = 10   # time for each period in seconds
+    Spawn.WEIGHTLIMIT = 10  # size of load allowed for each period
+
+If you use non standard commands you may help the system balancing the start by
+giving each command a specific weight. Some defualt commands are already defined.
+
+    # Specific weights for each command
+    Spawn.WEIGHT.SITMarkAVMulticontainerFFmpeg = 500
+
+A weight of 1 means that it normally may be started 1/sec.
+If you have a setting above the WEIGHTLIMIT it is started only as first
+of a time period. Best way is to have the weights < WEIGHTLIMIT to ensure
+proper priority handling.
+
+If you want to disable the loadhandling you may set the priority of a process
+or maybe even the default priority above 1. But keep in mind that this can
+lead to a system crash. A Better Way is to set the `LOAD` setting to a high value
+of maybe 5 (will limit the system load at about 20 per cpu).
+
 
 Load handling
 -------------------------------------------------
@@ -116,6 +148,20 @@ it through the number of cpu cores.
 So a load of 1 meaning every core has to do enough in the moment, but a system
 may also have more things to do (meaning they are in the system's queue) as the
 ones just being processed.
+
+| LOAD | prio 0..1 | quad-core load | comment for setting |
+|------|-----------|----------------|---------------------|
+|  0.2 | 0.2 - 0.8 | 0.6 -  3.2 | neither implies the system |
+|  0.5 | 0.4 - 2.0 | 1.6 - 10.0 | minor priority service |
+|  0.8 | 0.6 - 3.2 | 2.6 - 12.8 | customer system |
+|   1  | 0.8 - 4.0 | 3.6 - 20.0 | best performance (default) |
+|  1.5 | 1.2 - 6.0 | 4.8 - 24.0 | if peaks are short |
+|   2  | 1.6 - 8.0 | 6.4 - 32.0 | fast but may overload |
+|   5  | 4.0 - 20.0 | 16.0 - 80.0 | maintenance services only |
+
+As you see the correct setting depends on what purpose the machine has, what
+else runs on that machine and the priority of the service itself.
+
 
 ![Load Limit](src/doc/graph-load.png)
 
@@ -163,9 +209,11 @@ a highest priority process while waiting in the queue with different queue lengt
 
 Because the load values will take some time to show the new system load based on
 just started processes the number of processes to start each second are limited.
-The system has a limit of 1000 which may be used by started processes any second.
-Each process will take 10 from this limit while special specified processes may
-take more or less.
+The system has a limit and time period set (see above) which defines how many
+processes are allowed to be started.
+
+As an additional benefit smaller processes may be called earlier because their
+weight is low and can be added to the already high weight.
 
 
 API
