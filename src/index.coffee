@@ -127,6 +127,7 @@ class Spawn extends EventEmitter
         debug chalk.grey "current weight #{nweight} > #{@constructor.WEIGHTLIMIT},
         waiting #{@constructor.WAIT}s..."
         @constructor.queue++
+        @emit 'wait', @constructor.WAIT * 1000
         return setTimeout (=> @loadcheck cb), @constructor.WAIT * 1000
       @constructor.weight = nweight
       return cb()
@@ -136,6 +137,7 @@ class Spawn extends EventEmitter
     wait += @constructor.queue*10 # add 10ms waiting time for each job in queue
     debug chalk.grey "load #{load.toFixed 2} > #{limit.toFixed 2} (p=#{@priority.toFixed 2}), waiting #{~~(wait/1000)}s"
     @constructor.queue++
+    @emit 'wait', wait
     setTimeout (=> @loadcheck cb), wait
 
   # ### Start the process
@@ -220,6 +222,7 @@ class Spawn extends EventEmitter
       proc.on 'error', (@err) =>
         if err.message is 'spawn EMFILE'
           debug chalk.grey "too much processes are opened, waiting 1s..."
+          @emit 'wait', 1000
           return setTimeout (=> @_run cb), 1000
         bufferClean()
         @error = err
@@ -238,8 +241,10 @@ class Spawn extends EventEmitter
   retry: (cb) ->
     @priority = @constructor.prioritydown @priority
     if  @retrycount < @config.retry
-      debug "retry #{@retrycount+1}/#{@config.retry} in #{~~Math.pow(@retrycount+1, 3)}s caused by #{@error}"
-      return setTimeout (=> @_run cb), Math.pow(++@retrycount, 3) * 1000
+      wait = Math.pow(++@retrycount, 3) * 1000
+      debug "retry #{@retrycount+1}/#{@config.retry} in #{~~wait}s caused by #{@error}"
+      @emit 'retry', wait
+      return setTimeout (=> @_run cb), wait
     # end of retries
     @emit 'error', @error
     debugCmd chalk.red "[#{@pid}] #{@error.toString()}"

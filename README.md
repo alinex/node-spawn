@@ -340,6 +340,8 @@ Runtime data
 - `stdout` (string) - if a line is outputted
 - `stderr` (string) - if a error line is outputted
 - `done` (integer) - if the process finished giving exit code
+- `wait` (integer) - if the process is paused given seconds
+- `retry` (integer) - if the process will be retried after given seconds
 
 
 License
