@@ -132,7 +132,6 @@ command.</p>
 <p>include alinex modules</p>
         </td>
         <td class="code highlight"><div class="highlight"><pre>
-<span class="p">{</span><span class="nx">array</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span> <span class="s">&#39;alinex-util&#39;</span>
 
 <span class="nv">ERRORDETECT = </span><span class="sr">/Error:\s((\w| )+)/i</span>
 
@@ -646,7 +645,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
         </td>
         <td class="code highlight"><div class="highlight"><pre>
       <span class="nv">cmd = </span><span class="nx">@config</span><span class="p">.</span><span class="nx">cmd</span>
-      <span class="nv">args = </span><span class="nx">array</span><span class="p">.</span><span class="nx">clone</span> <span class="nx">@config</span><span class="p">.</span><span class="nx">args</span>
+      <span class="nv">args = </span><span class="nx">@config</span><span class="p">.</span><span class="nx">args</span><span class="p">.</span><span class="nx">slice</span> <span class="mi">0</span>
       <span class="k">if</span> <span class="nx">process</span><span class="p">.</span><span class="nx">platform</span> <span class="o">is</span> <span class="s">&#39;linux&#39;</span>
 
 </pre></div>
