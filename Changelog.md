@@ -4,6 +4,10 @@ Version changes
 The following list gives a short overview about what is changed between
 individual versions:
 
+Version 0.1.0 (2014-12-08)
+-------------------------------------------------
+- Bug with array clone.
+
 Version 0.0.2 (2014-12-08)
 -------------------------------------------------
 - Added support for windows.
