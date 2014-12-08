@@ -15,7 +15,6 @@ EventEmitter = require('events').EventEmitter
 os = require 'os'
 path = require 'path'
 # include alinex modules
-{array} = require 'alinex-util'
 
 ERRORDETECT = /Error:\s((\w| )+)/i
 
@@ -170,7 +169,7 @@ class Spawn extends EventEmitter
       @start = new Date
       # create new subprocess
       cmd = @config.cmd
-      args = array.clone @config.args
+      args = @config.args.slice 0
       if process.platform is 'linux'
         # add support for nice call
         nice = @constructor.nice @priority

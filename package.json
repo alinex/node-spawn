@@ -27,8 +27,7 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "alinex-util": "^0.1.11",
-    "chalk": "^0.5.1",
+    "chalk": "0.5.x",
     "debug": "2.x"
   },
   "devDependencies": {
