@@ -15,6 +15,7 @@ EventEmitter = require('events').EventEmitter
 os = require 'os'
 path = require 'path'
 # include alinex modules
+{array} = require 'alinex-util'
 
 ERRORDETECT = /Error:\s((\w| )+)/i
 
@@ -168,14 +169,16 @@ class Spawn extends EventEmitter
       @end = @code = @error = null
       @start = new Date
       # create new subprocess
-      nice = @constructor.nice @priority
-#      proc = spawn @config.cmd, @config.args,
-      args = [
-        '-n', @constructor.nice @priority # nice setting
-        @config.cmd # command
-      ]
-      args = args.concat @config.args if @config.args?
-      proc = spawn 'nice', args,
+      cmd = @config.cmd
+      args = array.clone @config.args
+      if process.platform is 'linux'
+        # add support for nice call
+        nice = @constructor.nice @priority
+        args.unshift @config.cmd # command
+        args.unshift @constructor.nice @priority # nice setting
+        args.unshift '-n'
+        cmd = 'nice'
+      @proc = spawn cmd, args,
         cwd: @config.cwd
         env: @config.env
         uid: @config.uid
@@ -184,8 +187,8 @@ class Spawn extends EventEmitter
       debugCmd "[#{@pid}] #{@config.cmd} #{(@config.args ? []).join ' '}"
       # collect output
       stdout = stderr = ''
-      proc.stdout.setEncoding "utf8"
-      proc.stdout.on 'data', (data) =>
+      @proc.stdout.setEncoding "utf8"
+      @proc.stdout.on 'data', (data) =>
         stdout += data.toString()
         pos = stdout.lastIndexOf '\n'
         if ~pos++
@@ -196,8 +199,8 @@ class Spawn extends EventEmitter
           @emit 'stdout', text # send through
           for line in text.split /\n/
             debugCmd chalk.grey "[#{proc.pid}] out: #{line}"
-      proc.stderr.setEncoding "utf8"
-      proc.stderr.on 'data', (data) =>
+      @proc.stderr.setEncoding "utf8"
+      @proc.stderr.on 'data', (data) =>
         stderr += data.toString()
         pos = stderr.lastIndexOf '\n'
         if ~pos++
@@ -219,7 +222,7 @@ class Spawn extends EventEmitter
           @emit 'stderr', stderr
           debugCmd chalk.grey "[#{proc.pid}] out: #{stderr}"
       # error management
-      proc.on 'error', (@err) =>
+      @proc.on 'error', (@err) =>
         if err.message is 'spawn EMFILE'
           debug chalk.grey "too much processes are opened, waiting 1s..."
           @emit 'wait', 1000
@@ -228,7 +231,7 @@ class Spawn extends EventEmitter
         @error = err
         @retry cb
       # process finished
-      proc.on 'close', (@code) =>
+      @proc.on 'close', (@code) =>
         @end = new Date
         bufferClean()
         debugCmd "[#{proc.pid}] exit: #{@code} after #{@end-@start}ms"
