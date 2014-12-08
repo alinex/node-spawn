@@ -40,11 +40,38 @@
       <div class="heading h3">
         <a href="#check%20for%20success">Check for Success</a>
       </div>
+      <div class="heading h3">
+        <a href="#use%20load%20handling%20and%20priorities">Use load handling and priorities</a>
+      </div>
+      <div class="heading h3">
+        <a href="#retry%20on%20failure">Retry on failure</a>
+      </div>
+      <div class="heading h2">
+        <a href="#load%20handling">Load handling</a>
+      </div>
+      <div class="heading h3">
+        <a href="#load%20checking">Load checking</a>
+      </div>
+      <div class="heading h3">
+        <a href="#sleep%20interval">Sleep Interval</a>
+      </div>
+      <div class="heading h3">
+        <a href="#priority%20level%20up">Priority Level up</a>
+      </div>
+      <div class="heading h3">
+        <a href="#start%20limit">Start limit</a>
+      </div>
+      <div class="heading h3">
+        <a href="#os%20priorities">OS Priorities</a>
+      </div>
       <div class="heading h2">
         <a href="#api">API</a>
       </div>
       <div class="heading h3">
-        <a href="#global%20functions">Global functions</a>
+        <a href="#class%20setup">Class setup</a>
+      </div>
+      <div class="heading h3">
+        <a href="#class%20variables">Class variables</a>
       </div>
       <div class="heading h3">
         <a href="#instantiate">Instantiate</a>
@@ -207,29 +234,283 @@ most used data. But you may access all details through the <code>proc</code> obj
 </div>
 
 
-<p>You may give a check method in the configuration which will be used to check
-whether the process succeeded:</p>
+<p>The class will automatically check for success (based on exit code) and run some
+retries. A message containing the error code and possibly some information from
+the output will be generated.</p>
+
+<p>You may give a different check method in the configuration which will be used to
+check whether the process succeeded and return an Error or undefined:</p>
 
 
 <div class="highlight"><pre><code><span class="nx">proc</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">check</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">proc</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="p">(</span><span class="nx">proc</span><span class="p">.</span><span class="nx">code</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">code</span> <span class="o">===</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">((</span><span class="nx">proc</span><span class="p">.</span><span class="nx">code</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">code</span> <span class="o">===</span> <span class="mi">0</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;Got exit code of &quot;</span> <span class="o">+</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">code</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="p">);</span>
+  <span class="p">}</span>
 <span class="p">};</span>
 </code></pre></div>
 
 
 
-<p>The above given check function is the default if nothing set.</p>
-
-<p>Now after the process finished you may check for the success (this will use the
-previously given check function):</p>
+<p>You may also make some ḱind of filter which specifies some known errors:</p>
 
 
-<div class="highlight"><pre><code><span class="k">if</span> <span class="p">(</span><span class="nx">proc</span><span class="p">.</span><span class="nx">success</span><span class="p">())</span> <span class="p">{</span>
-  <span class="c1">// do something</span>
+<div class="highlight"><pre><code><span class="nx">proc</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">check</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">proc</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">proc</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/Error: Unknown file type/</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="err">#</span> <span class="k">else</span> <span class="nx">use</span> <span class="nx">general</span> <span class="nx">check</span>
+  <span class="k">return</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">constructor</span><span class="p">.</span><span class="nx">check</span><span class="p">(</span><span class="nx">proc</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div>
+
+
+
+<p>This check will automatically be called on normal process close. If you want to
+know if it got an error you can use the event or callback value or check for:</p>
+
+
+<div class="highlight"><pre><code><span class="k">if</span> <span class="p">(</span><span class="nx">proc</span><span class="p">.</span><span class="nx">error</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// something went wrong</span>
 <span class="p">}</span>
 </code></pre></div>
 
 
+
+<p>If a check went wrong the process will be scheduled for retry after the following
+time (time=retry ^ 3):</p>
+
+<p>| Retry | Timeout | Total |
+|-------|---------|-------|
+|   1   |      1s |    1s |
+|   2   |      8s |    9s |
+|   3   |     27s |   36s |
+|   4   |     64s |  100s |
+|   5   |      2m |    4m |
+|   6   |      3m |    7m |
+|   7   |      6m |   13m |
+|   8   |      9m |   21m |
+|   9   |     12m |   33m |
+|  10   |     17m |   50m |</p>
+
+<p>On each retry the priority will go down giving in favor for other jobs which
+didn't failed.</p>
+
+<p>To disable retrying use the configuration:</p>
+
+
+<div class="highlight"><pre><code><span class="nx">proc</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">retry</span> <span class="o">=</span> <span class="mi">0</span>
+</code></pre></div>
+
+
+
+
+<div class="pilwrap" id="use%20load%20handling%20and%20priorities">
+  <h3>
+    <a href="#use%20load%20handling%20and%20priorities" name="use%20load%20handling%20and%20priorities" class="pilcrow">&#182;</a>
+    Use load handling and priorities
+  </h3>
+</div>
+
+
+<p>You don't have to do anything for load handling, it comes out of the box but you
+may customize it for your machine:</p>
+
+
+<div class="highlight"><pre><code><span class="err">#</span> <span class="nx">This</span> <span class="nx">maybe</span> <span class="nx">changed</span> <span class="nx">per</span> <span class="nx">machine</span><span class="p">.</span>
+<span class="nx">Spawn</span><span class="p">.</span><span class="nx">LOAD</span> <span class="o">=</span> <span class="mi">1</span>   <span class="err">#</span> <span class="nx">limit</span> <span class="nx">system</span> <span class="nx">load</span> <span class="p">(</span><span class="nx">limit</span> <span class="nx">will</span> <span class="nx">be</span> <span class="nx">between</span> <span class="mf">0.8</span><span class="o">*</span><span class="nx">LOAD</span> <span class="nx">and</span> <span class="mi">4</span><span class="o">*</span><span class="nx">LOAD</span><span class="p">)</span>
+<span class="nx">Spawn</span><span class="p">.</span><span class="nx">WAIT</span> <span class="o">=</span> <span class="mi">10</span>  <span class="err">#</span> <span class="nx">wait</span> <span class="nx">between</span> <span class="nx">WAIT</span> <span class="nx">seconds</span> <span class="nx">and</span> <span class="nx">WAIT</span> <span class="nx">minutes</span> <span class="o">+</span> <span class="nx">queue</span> <span class="nx">size</span>
+</code></pre></div>
+
+
+
+<p>See the detailed explanation below to see what each value means. Also you may
+specify what the limit of processes for each start period will be.</p>
+
+
+<div class="highlight"><pre><code><span class="err">#</span> <span class="nx">The</span> <span class="nx">weight</span> <span class="nx">which</span> <span class="nx">can</span> <span class="nx">be</span> <span class="nx">started</span> <span class="nx">per</span> <span class="nx">each</span> <span class="nx">start</span> <span class="nx">period</span>
+<span class="nx">Spawn</span><span class="p">.</span><span class="nx">WEIGHTTIME</span> <span class="o">=</span> <span class="mi">10</span>   <span class="err">#</span> <span class="nx">time</span> <span class="k">for</span> <span class="nx">each</span> <span class="nx">period</span> <span class="k">in</span> <span class="nx">seconds</span>
+<span class="nx">Spawn</span><span class="p">.</span><span class="nx">WEIGHTLIMIT</span> <span class="o">=</span> <span class="mi">10</span>  <span class="err">#</span> <span class="nx">size</span> <span class="nx">of</span> <span class="nx">load</span> <span class="nx">allowed</span> <span class="k">for</span> <span class="nx">each</span> <span class="nx">period</span>
+</code></pre></div>
+
+
+
+<p>If you use non standard commands you may help the system balancing the start by
+giving each command a specific weight. Some default commands are already defined.</p>
+
+
+<div class="highlight"><pre><code><span class="err">#</span> <span class="nx">Specific</span> <span class="nx">weights</span> <span class="k">for</span> <span class="nx">each</span> <span class="nx">command</span>
+<span class="nx">Spawn</span><span class="p">.</span><span class="nx">WEIGHT</span><span class="p">.</span><span class="nx">SITMarkAVMulticontainerFFmpeg</span> <span class="o">=</span> <span class="mi">500</span>
+</code></pre></div>
+
+
+
+<p>A weight of 1 means that it normally may be started 1/sec.
+If you have a setting above the WEIGHTLIMIT it is started only as first
+of a time period. Best way is to have the weights &lt; WEIGHTLIMIT to ensure
+proper priority handling.</p>
+
+<p>If you want to disable the loadhandling you may set the priority of a process
+or maybe even the default priority above 1. But keep in mind that this can
+lead to a system crash. A Better Way is to set the <code>LOAD</code> setting to a high value
+of maybe 5 (will limit the system load at about 20 per cpu).</p>
+
+
+<div class="pilwrap" id="retry%20on%20failure">
+  <h3>
+    <a href="#retry%20on%20failure" name="retry%20on%20failure" class="pilcrow">&#182;</a>
+    Retry on failure
+  </h3>
+</div>
+
+
+<p>If a command got an error it may be called again. How often is specified in it's
+configuration <code>retry</code> or from the default <code>retry</code> setting in the class. The next
+run will start at the quadrature time in seconds (1, 4, 9, 16, 25, ... seconds).</p>
+
+<p>After the defined number of retries the spawn will return with an error.</p>
+
+<p>If the problem is the process limit it will automatically rerun after 1 second
+without counting that.</p>
+
+
+<div class="pilwrap" id="load%20handling">
+  <h2>
+    <a href="#load%20handling" name="load%20handling" class="pilcrow">&#182;</a>
+    Load handling
+  </h2>
+</div>
+
+
+<p>Starting lots and heavy processes can lead to a fully overloaded systems which
+won't really do anything.</p>
+
+<p>To don't get into such a situation the spawn module will check the system and
+wait for creating the new system processes till the system can handle it. All
+this have to be done prioritized.</p>
+
+
+<div class="pilwrap" id="load%20checking">
+  <h3>
+    <a href="#load%20checking" name="load%20checking" class="pilcrow">&#182;</a>
+    Load checking
+  </h3>
+</div>
+
+
+<p>Therefore the system will check the current system load. To get a comparable
+value the load as displayed in the <code>top</code> command will be harmonized by dividing
+it through the number of cpu cores.</p>
+
+
+<div class="highlight"><pre><code><span class="nx">load</span> <span class="o">=</span> <span class="kr">short</span><span class="o">-</span><span class="nx">load</span> <span class="o">/</span> <span class="nx">num</span><span class="o">-</span><span class="nx">cpus</span>
+</code></pre></div>
+
+
+
+<p>So a load of 1 meaning every core has to do enough in the moment, but a system
+may also have more things to do (meaning they are in the system's queue) as the
+ones just being processed.</p>
+
+<p>| LOAD | prio 0..1 | quad-core load | comment for setting |
+|------|-----------|----------------|---------------------|
+|  0.2 | 0.2 - 0.8 | 0.6 -  3.2 | neither implies the system |
+|  0.5 | 0.4 - 2.0 | 1.6 - 10.0 | minor priority service |
+|  0.8 | 0.6 - 3.2 | 2.6 - 12.8 | customer system |
+|   1  | 0.8 - 4.0 | 3.6 - 20.0 | best performance (default) |
+|  1.5 | 1.2 - 6.0 | 4.8 - 24.0 | if peaks are short |
+|   2  | 1.6 - 8.0 | 6.4 - 32.0 | fast but may overload |
+|   5  | 4.0 - 20.0 | 16.0 - 80.0 | maintenance services only |</p>
+
+<p>As you see the correct setting depends on what purpose the machine has, what
+else runs on that machine and the priority of the service itself.</p>
+
+<p><img src="src/doc/graph-load.png" alt="Load Limit" title="" /></p>
+
+<p>Like the above graph shows the spawn module has a load <code>LIMIT</code> set per each
+machine. This specifies up to which harmonized load a process can be started.
+The graph shows how this is implemented for different priorities.</p>
+
+<p>The default setting for a machine in the backoffice which should run as much
+processes as possible should be 1.0 while you may use lower values if the
+system should keep fast and responsible for other things, too.</p>
+
+
+<div class="pilwrap" id="sleep%20interval">
+  <h3>
+    <a href="#sleep%20interval" name="sleep%20interval" class="pilcrow">&#182;</a>
+    Sleep Interval
+  </h3>
+</div>
+
+
+<p>If an process can't be started because the system load is to high and maybe his
+priority to low, it will be queued and rechecked after a timeout again. Because
+higher prioritized processes can start earlier they will be checked more
+frequently than lower priority processes.</p>
+
+<p><img src="src/doc/graph-timeout.png" alt="Retry Timeout" title="" /></p>
+
+<p>The graph shows how long the interval till the next check will be for different
+<code>WAIT</code> settings. This value will set the minimum wait time in seconds and the
+maximum wait time in minutes.</p>
+
+<p>But to decrease the load the system will get from rechecking thousands of waiting
+processes the interval also will be 10ms longer for each already waiting process.
+This gives the system enough performance to also do the real work while rechecking
+the load.</p>
+
+
+<div class="pilwrap" id="priority%20level%20up">
+  <h3>
+    <a href="#priority%20level%20up" name="priority%20level%20up" class="pilcrow">&#182;</a>
+    Priority Level up
+  </h3>
+</div>
+
+
+<p>To get processes which are waiting long be processed first their priority will
+slowly increase and go against the highest priority of 1.0.</p>
+
+<p><img src="src/doc/graph-priority.png" alt="Priority Up" title="" /></p>
+
+<p>This causes a reduced waiting time for the next chack and higher load limits.</p>
+
+<p><img src="src/doc/graph-timetoprio1.png" alt="Time to Prio 1" title="" /></p>
+
+<p>This diagram shows how long it will take for a specific process call to become
+a highest priority process while waiting in the queue with different queue lengths.</p>
+
+
+<div class="pilwrap" id="start%20limit">
+  <h3>
+    <a href="#start%20limit" name="start%20limit" class="pilcrow">&#182;</a>
+    Start limit
+  </h3>
+</div>
+
+
+<p>Because the load values will take some time to show the new system load based on
+just started processes the number of processes to start each second are limited.
+The system has a limit and time period set (see above) which defines how many
+processes are allowed to be started.</p>
+
+<p>As an additional benefit smaller processes may be called earlier because their
+weight is low and can be added to the already high weight.</p>
+
+
+<div class="pilwrap" id="os%20priorities">
+  <h3>
+    <a href="#os%20priorities" name="os%20priorities" class="pilcrow">&#182;</a>
+    OS Priorities
+  </h3>
+</div>
+
+
+<p>The process priorities will not only work for the start queue but also on the
+operating system if already running. Therefore the nice-value of each process is
+set appropriate to it's priority. That allows the operating system to give the
+processes different amount of cpu time. The range goes from 5% to 200% of the
+normal system process (nice=0).</p>
 
 
 <div class="pilwrap" id="api">
@@ -241,13 +522,43 @@ previously given check function):</p>
 
 
 
-<div class="pilwrap" id="global%20functions">
+<div class="pilwrap" id="class%20setup">
   <h3>
-    <a href="#global%20functions" name="global%20functions" class="pilcrow">&#182;</a>
-    Global functions
+    <a href="#class%20setup" name="class%20setup" class="pilcrow">&#182;</a>
+    Class setup
   </h3>
 </div>
 
+
+<ul>
+<li><code>LOAD</code> (float) - limit system load (limit will be between 0.8<em>LOAD and 4</em>LOAD)</li>
+<li><code>WAIT</code> (float) - wait between WAIT seconds and WAIT minutes + queue size</li>
+<li><code>WEIGHTTIME</code> (float) - time for each period in seconds</li>
+<li><code>WEIGHTLIMIT</code> (float) - size of load allowed for each period</li>
+<li><code>WEIGHT</code> (object) - map of weight values for each command</li>
+</ul>
+
+<p>Default values:</p>
+
+<ul>
+<li><code>retry</code> (integer) - default number of retries</li>
+<li><code>priority</code> (float) - default priority</li>
+</ul>
+
+
+<div class="pilwrap" id="class%20variables">
+  <h3>
+    <a href="#class%20variables" name="class%20variables" class="pilcrow">&#182;</a>
+    Class variables
+  </h3>
+</div>
+
+
+<ul>
+<li><code>time</code> (integer) - current time period</li>
+<li><code>weight</code> (float) - already used weight in this time period</li>
+<li><code>queue</code> (integer) - number of processes in queue</li>
+</ul>
 
 
 <div class="pilwrap" id="instantiate">
@@ -295,18 +606,22 @@ again.</p>
 
 <ul>
 <li><code>config</code> - setup for the process
-<ul><li>cmd (string) - the command to run</li>
+<ul><li>name (string) - descriptive name (optional)</li>
+<li>cmd (string) - the command to run</li>
 <li>args (array) - all arguments to be given to the command</li>
 <li>cwd (string) - current working directory</li>
 <li>env (object) - environment key-value pairs</li>
 <li>uid (integer) - user identity of the process</li>
 <li>gid (integer) - group identity of the process</li>
-<li>check (function) - to check whether process succeeded</li></ul></li>
+<li>check (function) - to check whether process succeeded</li>
+<li>priority (float) - between 0..1</li>
+<li>retry (integer) - number of possible retries</li></ul></li>
 </ul>
 
-<p>Data from the last run:</p>
+<p>Runtime data</p>
 
 <ul>
+<li><code>name</code> - descriptive name of the process</li>
 <li><code>pid</code> - process pid which has been given</li>
 <li><code>start</code> - date when the process started</li>
 <li><code>end</code> - date when the process finished</li>
@@ -314,6 +629,7 @@ again.</p>
 <li><code>stdout</code> - output of the process</li>
 <li><code>stderr</code> - error output of the process</li>
 <li><code>error</code> - Error object if one occurred</li>
+<li><code>retrycount</code> (integer) - number of retries</li>
 </ul>
 
 
@@ -330,6 +646,8 @@ again.</p>
 <li><code>stdout</code> (string) - if a line is outputted</li>
 <li><code>stderr</code> (string) - if a error line is outputted</li>
 <li><code>done</code> (integer) - if the process finished giving exit code</li>
+<li><code>wait</code> (integer) - if the process is paused given seconds</li>
+<li><code>retry</code> (integer) - if the process will be retried after given seconds</li>
 </ul>
 
 
