@@ -77,8 +77,12 @@ With events you can monitor what's going on while the process works.
 
 ### Check for Success
 
-You may give a check method in the configuration which will be used to check
-whether the process succeeded and return an Error or undefined:
+The class will automatically check for success (based on exit code) and run some
+retries. A message containing the error code and possibly some information from
+the output will be generated.
+
+You may give a different check method in the configuration which will be used to
+check whether the process succeeded and return an Error or undefined:
 
     proc.config.check = function(proc) {
       if (!((proc.code != null) && proc.code === 0)) {
@@ -86,7 +90,15 @@ whether the process succeeded and return an Error or undefined:
       }
     };
 
-The above given check function is the default if nothing set.
+You may also make some ḱind of filter which specifies some known errors:
+
+    proc.config.check = function(proc) {
+      if (proc.stdout.match(/Error: Unknown file type/)) {
+        return null;
+      }
+      # else use general check
+      return proc.constructor.check(proc);
+    };
 
 This check will automatically be called on normal process close. If you want to
 know if it got an error you can use the event or callback value or check for:
@@ -94,6 +106,30 @@ know if it got an error you can use the event or callback value or check for:
     if (proc.error != null) {
       // something went wrong
     }
+
+If a check went wrong the process will be scheduled for retry after the following
+time (time=retry ^ 3):
+
+| Retry | Timeout | Total |
+|-------|---------|-------|
+|   1   |      1s |    1s |
+|   2   |      8s |    9s |
+|   3   |     27s |   36s |
+|   4   |     64s |  100s |
+|   5   |      2m |    4m |
+|   6   |      3m |    7m |
+|   7   |      6m |   13m |
+|   8   |      9m |   21m |
+|   9   |     12m |   33m |
+|  10   |     17m |   50m |
+
+On each retry the priority will go down giving in favor for other jobs which
+didn't failed.
+
+To disable retrying use the configuration:
+
+    proc.config.retry = 0
+
 
 ### Use load handling and priorities
 
@@ -275,6 +311,7 @@ See the `config` property below for what to be configured here.
 ### Properties
 
 - `config` - setup for the process
+  - name (string) - descriptive name (optional)
   - cmd (string) - the command to run
   - args (array) - all arguments to be given to the command
   - cwd (string) - current working directory
@@ -283,21 +320,11 @@ See the `config` property below for what to be configured here.
   - gid (integer) - group identity of the process
   - check (function) - to check whether process succeeded
   - priority (float) - between 0..1
-  -
+  - retry (integer) - number of possible retries
 
 Runtime data
 
-- `stdout` (string) - standard output of process
-- `stderr` (string) - error output of process
-- `code` (integer) - return code (exit code)
-- `error` (Error) - error message
-- `pid` (integer) - process id
-- `start` (Date) - time of start of process
-- `end` (Date) - time of end of process
-- `retry` (integer) - number of retrys
-
-Data from the last run:
-
+- `name` - descriptive name of the process
 - `pid` - process pid which has been given
 - `start` - date when the process started
 - `end` - date when the process finished
@@ -305,6 +332,7 @@ Data from the last run:
 - `stdout` - output of the process
 - `stderr` - error output of the process
 - `error` - Error object if one occurred
+- `retrycount` (integer) - number of retries
 
 ### Events
 

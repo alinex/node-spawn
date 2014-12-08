@@ -16,6 +16,7 @@ os = require 'os'
 path = require 'path'
 # include alinex modules
 
+ERRORDETECT = /Error:\s((\w| )+)/i
 
 # Class definition
 # -------------------------------------------------
@@ -25,10 +26,10 @@ class Spawn extends EventEmitter
   # -------------------------------------------------
   # This maybe changed per machine.
   @LOAD: 1 # limit system load (limit will be between 0.8*LOAD and 4*LOAD)
-  @WAIT: 1 # wait between WAIT seconds and WAIT minutes + queue size
+  @WAIT: 3 # wait between WAIT seconds and WAIT minutes + queue size
 
   # The weight which can be started per each start period
-  @WEIGHTTIME: 10 # time for each period in seconds
+  @WEIGHTTIME: 1 # time for each period in seconds
   @WEIGHTLIMIT: @WEIGHTTIME * os.cpus().length # size of load allowed for each period
 
   # Specific weights for each command:
@@ -38,7 +39,7 @@ class Spawn extends EventEmitter
   # of a time period. Best way is to have the weights < WEIGHTLIMIT to ensure
   # proper priority handling.
   @WEIGHT:
-    DEFAULT: 0.5
+    DEFAULT: 0.2
     ffmpeg: 10
     lame: 10
 
@@ -57,12 +58,22 @@ class Spawn extends EventEmitter
   @load: (p) -> (3.2 * Math.pow((Math.exp(p)-1)/(Math.E-1),2) + 0.8) * @LOAD
 
   # ### Priority Up
-  # This method updates the priority before a timeout.
+  # This method calculates the new priority before a timeout.
   @priorityup: (p) -> 1 - Math.pow 1-p, 1.1
+
+  # ### Priority Down
+  # This method calculates the new priority before a retry.
+  @prioritydown: (p) -> Math.pow p, 0.8
 
   # ### Timeout
   # This gives the number of milliseconds to wait
-  @loadtimeout: (p) -> (59 * (1 - p) + 1) * @WAIT * 1000
+  @loadtimeout: (p, diff) ->
+    q = switch
+      when diff < 1.05 then 10
+      when diff < 1.1 then 5
+      when diff < 1.2 then 2
+      else 1
+    (59 * (1 - p) + 1) * @WAIT * 1000 / q
 
   # ### Nice value
   # This brings the priorities to the operating system
@@ -70,24 +81,34 @@ class Spawn extends EventEmitter
     v = if p > 1 then 0 else 1-p
     ~~(v*39 - 20)
 
+  # ### General check method
+  # This is used if no other check method given.
+  @check = (proc) ->
+    unless proc.code? and proc.code is 0
+      msg = "Got exit code of #{proc.code}"
+      # try to get detailed error message
+      if proc.stderr.length
+        match = proc.stderr.match ERRORDETECT
+        msg += ' caused by ' + match[1] if match
+      else
+        match = proc.stdout.match ERRORDETECT
+        msg += ' caused by ' + match[1] if match
+      # create error message
+      new Error "#{msg} in '#{proc.name}'."
+
   # Instance methods
   # -------------------------------------------------
 
   # ### Create instance
   constructor: (@config) ->
-    unless @config.check
-      @config.check = (proc) ->
-        unless proc.code? and proc.code is 0
-          new Error "Got exit code of #{proc.code}."
+    @config.check = @constructor.check unless @config.check
 
   # ### Check if it can start
   loadcheck: (cb) =>
-    return cb() if @config.priority > 1 # run immediately
+    return cb() if @priority > 1 # run immediately
     @constructor.queue--
     load = os.loadavg()[0] / os.cpus().length
-    limit = @constructor.load @config.priority
-    debug chalk.grey "current load is #{load.toFixed 2},
-    limit is #{limit.toFixed 2} (p=#{@config.priority.toFixed 2})"
+    limit = @constructor.load @priority
     # load is ok, but check current added weight
     if load < limit
       # reset weight if new time (unit=10s)
@@ -103,49 +124,52 @@ class Spawn extends EventEmitter
         @constructor.weight + @constructor.WEIGHT.DEFAULT
       # check new weight > limit (timeout 1000)
       if @constructor.weight isnt 0 and nweight > @constructor.WEIGHTLIMIT
-        debug chalk.grey "current weight to high (#{@constructor.weight})
-        at #{@constructor.time}, waiting..."
+        debug chalk.grey "current weight #{nweight} > #{@constructor.WEIGHTLIMIT},
+        waiting #{@constructor.WAIT}s..."
         @constructor.queue++
-        return setTimeout (=> @loadcheck cb), 10000
+        return setTimeout (=> @loadcheck cb), @constructor.WAIT * 1000
       @constructor.weight = nweight
-      debug chalk.grey "current weight limit is now #{@constructor.weight}
-      at #{@constructor.time}"
       return cb()
     # rerun check after timeout
-    @config.priority = @constructor.priorityup @config.priority
-    wait =  @constructor.loadtimeout @config.priority
+    @priority = @constructor.priorityup @priority
+    wait =  @constructor.loadtimeout @priority, load/limit
     wait += @constructor.queue*10 # add 10ms waiting time for each job in queue
-    debug chalk.grey "wait #{~~(wait/1000)}s with process for load
-    to go below #{limit.toFixed 2}"
+    debug chalk.grey "load #{load.toFixed 2} > #{limit.toFixed 2} (p=#{@priority.toFixed 2}), waiting #{~~(wait/1000)}s"
     @constructor.queue++
     setTimeout (=> @loadcheck cb), wait
 
   # ### Start the process
   run: (cb) ->
+    # update config
+    @config.priority ?= @constructor.priority
+    @config.retry ?= @constructor.retry
+    # init internal variables
+    @retrycount = 0
+    @priority = @config.priority
+    @name = @config.name ? "#{path.basename @config.cmd} #{(@config.args ? []).join ' '}"
+    # check system load
+    debug "add job #{@name}"
+    @_run cb
+
+  _run: (cb) ->
     # check configuration
     unless @config.cmd
       err = new Error "No command specified for spawn."
       @emit 'error', err
       cb err if cb
       return
-    # update config
-    @config.priority ?= @constructor.priority
-    @config.retry ?= @constructor.retry
-    # check system load
-    debug "add job #{@config.cmd} #{(@config.args ? []).join ' '}"
     @constructor.queue++
     @loadcheck =>
-      debug "start job #{@config.cmd} #{(@config.args ? []).join ' '}"
+      debug "start job #{@name}"
       # cleanup result
       @stdout = @stderr = ''
       @end = @code = @error = null
-      @retry = 0
       @start = new Date
       # create new subprocess
-      nice = @constructor.nice @config.priority
+      nice = @constructor.nice @priority
 #      proc = spawn @config.cmd, @config.args,
       args = [
-        '-n', @constructor.nice @config.priority # nice setting
+        '-n', @constructor.nice @priority # nice setting
         @config.cmd # command
       ]
       args = args.concat @config.args if @config.args?
@@ -195,11 +219,11 @@ class Spawn extends EventEmitter
       # error management
       proc.on 'error', (@err) =>
         if err.message is 'spawn EMFILE'
-          debug chalk.grey "too much processes are opened, waiting..."
-          return setTimeout (=> @run cb), 1000
+          debug chalk.grey "too much processes are opened, waiting 1s..."
+          return setTimeout (=> @_run cb), 1000
         bufferClean()
         @error = err
-        retry cb
+        @retry cb
       # process finished
       proc.on 'close', (@code) =>
         @end = new Date
@@ -207,13 +231,15 @@ class Spawn extends EventEmitter
         debugCmd "[#{proc.pid}] exit: #{@code} after #{@end-@start}ms"
         @emit 'done', @code
         @error = @config.check @
-        return retry cb if @error
+        return @retry cb if @error
         cb @error, @stdout, @stderr, @code if cb
 
   # ### Retry process call after error
   retry: (cb) ->
-    if  @retry < @config.retry
-      return setTimeout (=> @run cb), Math.exp(++@retry, 2) * 1000
+    @priority = @constructor.prioritydown @priority
+    if  @retrycount < @config.retry
+      debug "retry #{@retrycount+1}/#{@config.retry} in #{~~Math.pow(@retrycount+1, 3)}s caused by #{@error}"
+      return setTimeout (=> @_run cb), Math.pow(++@retrycount, 3) * 1000
     # end of retries
     @emit 'error', @error
     debugCmd chalk.red "[#{@pid}] #{@error.toString()}"
