@@ -169,7 +169,8 @@ class Spawn extends EventEmitter
       @start = new Date
       # create new subprocess
       cmd = @config.cmd
-      args = @config.args.slice 0
+      args = []
+      args = @config.args.slice 0 if @config.args?
       if process.platform is 'linux'
         # add support for nice call
         nice = @constructor.nice @priority
@@ -182,7 +183,7 @@ class Spawn extends EventEmitter
         env: @config.env
         uid: @config.uid
         gif: @config.gid
-      @pid = proc.pid
+      @pid = @proc.pid
       debugCmd "[#{@pid}] #{@config.cmd} #{(@config.args ? []).join ' '}"
       # collect output
       stdout = stderr = ''
@@ -197,7 +198,7 @@ class Spawn extends EventEmitter
           @stdout += text
           @emit 'stdout', text # send through
           for line in text.split /\n/
-            debugCmd chalk.grey "[#{proc.pid}] out: #{line}"
+            debugCmd chalk.grey "[#{@pid}] out: #{line}"
       @proc.stderr.setEncoding "utf8"
       @proc.stderr.on 'data', (data) =>
         stderr += data.toString()
@@ -209,17 +210,17 @@ class Spawn extends EventEmitter
           @stderr += text
           @emit 'stderr', text # send through
           for line in text.split /\n/
-            debugCmd chalk.grey "[#{proc.pid}] err: #{line}"
+            debugCmd chalk.grey "[#{@pid}] err: #{line}"
       # cleanup buffers
       bufferClean = =>
         if stdout
           @stdout = stdout
           @emit 'stdout', stdout
-          debugCmd chalk.grey "[#{proc.pid}] out: #{stdout}"
+          debugCmd chalk.grey "[#{@pid}] out: #{stdout}"
         if stderr
           @stderr = stderr
           @emit 'stderr', stderr
-          debugCmd chalk.grey "[#{proc.pid}] out: #{stderr}"
+          debugCmd chalk.grey "[#{@pid}] out: #{stderr}"
       # error management
       @proc.on 'error', (@err) =>
         if err.message is 'spawn EMFILE'
@@ -233,7 +234,7 @@ class Spawn extends EventEmitter
       @proc.on 'close', (@code) =>
         @end = new Date
         bufferClean()
-        debugCmd "[#{proc.pid}] exit: #{@code} after #{@end-@start}ms"
+        debugCmd "[#{@pid}] exit: #{@code} after #{@end-@start}ms"
         @emit 'done', @code
         @error = @config.check @
         return @retry cb if @error
