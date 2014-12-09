@@ -1,0 +1,32 @@
+# Setup for spawn load
+# =================================================
+
+# ##+# Maximum load handling
+# This maybe changed per machine.
+load:
+  limit: 1 # limit system load (limit will be between 0.8*LOAD and 4*LOAD)
+  wait: 3 # wait between WAIT seconds and WAIT minutes + queue size
+
+# ### Start limit
+# The weight which can be started per each start period
+start:
+  interval: 1 # time for each period in seconds
+  limit: 8 # weight allowed for each period (default is interval * cpus)
+
+# Specific weights for each command:
+#
+# A weight of 1 means that it normally may be started 1/sec and cpu.
+# If you have a setting above the WEIGHTLIMIT it is started only as first
+# of a time period. Best way is to have the weights < WEIGHTLIMIT to ensure
+# proper priority handling.
+weight:
+  DEFAULT: 0.2
+  ffmpeg: 10
+  lame: 10
+
+# ### Process defaults
+# Values used if nothing specified in process itself.
+default:
+  priority: 0.3   # default priority if none given
+  retry: 5 # default number of retries
+
