@@ -1,10 +1,10 @@
 {
   "name": "alinex-spawn",
   "version": "0.1.3",
-  "description": "",
+  "description": "Extended version of the process.spawn method",
   "copyright": "Alexander Schilling 2014",
   "private": false,
-  "keywords": [],
+  "keywords": ["span", "exec", "process"],
   "homepage": "http://alinex.github.io/node-spawn/",
   "repository": {
     "type": "git",
@@ -31,9 +31,9 @@
     "debug": "2.x"
   },
   "devDependencies": {
-    "alinex-error": "^0.2.6",
+    "alinex-error": "0.2.x",
     "alinex-make": "0.4.x",
-    "chai": "^1.10.0"
+    "chai": "1.x"
   },
   "optionalDependencies": {},
   "engines": {
