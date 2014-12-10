@@ -127,7 +127,7 @@ class Spawn extends EventEmitter
       # check new weight > limit (timeout 1000)
       if @constructor.weight isnt 0 and nweight > @constructor.config.start.limit
         debug chalk.grey "current weight #{nweight} > #{@constructor.config.start.limit},
-        waiting #{@constructor.config.start.interval}s..."
+        waiting #{~~(@constructor.config.start.interval/1000)}s..."
         @constructor.queue++
         @emit 'wait', @constructor.config.start.interval
         return setTimeout (=> @loadcheck cb), @constructor.config.start.interval
@@ -144,6 +144,10 @@ class Spawn extends EventEmitter
 
   # ### Start the process
   run: (cb) ->
+    # start initializing, if not done
+    unless Spawn.initDone?
+      return Spawn.init null, => @run cb
+      #cb new Error "Spawn is not initialized, call `Spawn.init();` first."
     # wait till configuration is loaded
     if @constructor.configClass? and not @constructor.configClass.loaded
       return @constructor.configClass.load (err) =>

@@ -36,6 +36,11 @@ use the events.
 First you have to load the class package.
 
     Spawn = require('alinex-spawn');
+    Spawn.init(); # optional loading spawn... config
+
+You may also load a specific configuration like:
+
+    Spawn.init('spawn');
 
 Now you may setup an external process like:
 
@@ -134,8 +139,9 @@ To disable retrying use the configuration:
 ### Use load handling and priorities
 
 You don't have to do anything for load handling, it comes out of the box but you
-may customize it for your machine:
+may customize it for your machine in the configuration file.
 
+You may also add specific settings dynamically after loading
     # This maybe changed per machine.
     Spawn.LOAD = 1   # limit system load (limit will be between 0.8*LOAD and 4*LOAD)
     Spawn.WAIT = 10  # wait between WAIT seconds and WAIT minutes + queue size

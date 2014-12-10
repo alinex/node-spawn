@@ -1,5 +1,6 @@
 # Setup for spawn load
 # =================================================
+# Default settings to fully use a machine.
 
 # ##+# Maximum load handling
 # This maybe changed per machine.
@@ -11,7 +12,7 @@ load:
 # The weight which can be started per each start period
 start:
   interval: 1s # time for each period in seconds
-  limit: 8 # weight allowed for each period (default is interval * cpus)
+  #limit: 8 # weight allowed for each period (default is interval * cpus)
 
 # Specific weights for each command:
 #
