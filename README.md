@@ -282,19 +282,13 @@ API
 
 ### Class setup
 
-- `LOAD` (float) - limit system load (limit will be between 0.8*LOAD and 4*LOAD)
-- `WAIT` (float) - wait between WAIT seconds and WAIT minutes + queue size
-- `WEIGHTTIME` (float) - time for each period in seconds
-- `WEIGHTLIMIT` (float) - size of load allowed for each period
-- `WEIGHT` (object) - map of weight values for each command
-
-Default values:
-
-- `retry` (integer) - default number of retries
-- `priority` (float) - default priority
+- `ìnit(config, cb);` - initialize the spawn class
 
 ### Class variables
 
+- `config` (object) - configuration settings for the machine
+- `configClass` (Config) - alinex-config instance which loaded the configuration
+- `initDone` (boolean) - flag indication the class is initialized
 - `time` (integer) - current time period
 - `weight` (float) - already used weight in this time period
 - `queue` (integer) - number of processes in queue
@@ -348,6 +342,14 @@ Runtime data
 - `done` (integer) - if the process finished giving exit code
 - `wait` (integer) - if the process is paused given seconds
 - `retry` (integer) - if the process will be retried after given seconds
+
+
+Problems
+-------------------------------------------------
+If you get the message that too much event listeners are set on the config
+class and this may be a memory leak. You started to much processes while the
+config is not fully loaded. Better use the `Spawn.init()` method with a
+callback to wait for the initialization before starting.
 
 
 License
