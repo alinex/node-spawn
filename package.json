@@ -4,7 +4,11 @@
   "description": "Extended version of the process.spawn method",
   "copyright": "Alexander Schilling 2014",
   "private": false,
-  "keywords": ["span", "exec", "process"],
+  "keywords": [
+    "span",
+    "exec",
+    "process"
+  ],
   "homepage": "http://alinex.github.io/node-spawn/",
   "repository": {
     "type": "git",
@@ -27,6 +31,7 @@
     "lib": "./lib"
   },
   "dependencies": {
+    "alinex-config": "^0.3.2",
     "chalk": "0.5.x",
     "debug": "2.x"
   },

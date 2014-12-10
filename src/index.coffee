@@ -15,37 +15,39 @@ EventEmitter = require('events').EventEmitter
 os = require 'os'
 path = require 'path'
 # include alinex modules
+Config = require 'alinex-config'
+# internal helpers
+configcheck = require './configcheck'
 
+
+# the expression to find detailed error messages in unknown processes
 ERRORDETECT = /Error:\s((\w| )+)/i
+
 
 # Class definition
 # -------------------------------------------------
 class Spawn extends EventEmitter
 
-  # Machine setup
-  # -------------------------------------------------
-  # This maybe changed per machine.
-  @LOAD: 1 # limit system load (limit will be between 0.8*LOAD and 4*LOAD)
-  @WAIT: 3 # wait between WAIT seconds and WAIT minutes + queue size
-
-  # The weight which can be started per each start period
-  @WEIGHTTIME: 1 # time for each period in seconds
-  @WEIGHTLIMIT: @WEIGHTTIME * os.cpus().length # size of load allowed for each period
-
-  # Specific weights for each command:
-  #
-  # A weight of 1 means that it normally may be started 1/sec and cpu.
-  # If you have a setting above the WEIGHTLIMIT it is started only as first
-  # of a time period. Best way is to have the weights < WEIGHTLIMIT to ensure
-  # proper priority handling.
-  @WEIGHT:
-    DEFAULT: 0.2
-    ffmpeg: 10
-    lame: 10
-
-  # default values
-  @priority: 0.3   # default priority if none given
-  @retry: 5 # default number of retries
+  @init: (@config = 'spawn', cb) ->
+    debug "init or reinit spawn"
+    # set config from different values
+    if typeof @config is 'string'
+      @config = Config.instance @config
+      @config.setCheck configcheck
+    if @config instanceof Config
+      @configClass = @config
+      @config = @configClass.data
+    @initDone = false # status set to true after initializing
+    # set init status if configuration is loaded
+    unless @configClass?
+      cb() if cb?
+      @initDone = true
+    else
+      # wait till configuration is loaded
+      @configClass.load (err) =>
+        console.error err if err
+        cb err if cb?
+        @initDone = true
 
   # overall runtime information
   @weight: 0
@@ -55,7 +57,7 @@ class Spawn extends EventEmitter
   # ### Get load limit
   # returns the load limit (between 0.8 and 4.0 with LOAD=1) the curve
   # is strong exponential, meaning higher priorities are higher load values allowed
-  @load: (p) -> (3.2 * Math.pow((Math.exp(p)-1)/(Math.E-1),2) + 0.8) * @LOAD
+  @load: (p) -> (3.2 * Math.pow((Math.exp(p)-1)/(Math.E-1),2) + 0.8) * @config.load.limit
 
   # ### Priority Up
   # This method calculates the new priority before a timeout.
@@ -73,7 +75,7 @@ class Spawn extends EventEmitter
       when diff < 1.1 then 5
       when diff < 1.2 then 2
       else 1
-    (59 * (1 - p) + 1) * @WAIT * 1000 / q
+    (59 * (1 - p) + 1) * @config.load.wait / q
 
   # ### Nice value
   # This brings the priorities to the operating system
@@ -112,23 +114,23 @@ class Spawn extends EventEmitter
     # load is ok, but check current added weight
     if load < limit
       # reset weight if new time (unit=10s)
-      ntime = ~~(+new Date / @constructor.WEIGHTTIME / 1000)
+      ntime = ~~(+new Date / @constructor.config.start.interval)
       if ntime isnt @constructor.time
         @constructor.time = ntime
         @constructor.weight = 0
       # calculate new weight
       name = path.basename(@config.cmd)
-      nweight = if @constructor.WEIGHT[name]?
-        @constructor.weight + @constructor.WEIGHT[name]
+      nweight = if @constructor.config.weight[name]?
+        @constructor.weight + @constructor.config.weight[name]
       else
-        @constructor.weight + @constructor.WEIGHT.DEFAULT
+        @constructor.weight + @constructor.config.weight.DEFAULT
       # check new weight > limit (timeout 1000)
-      if @constructor.weight isnt 0 and nweight > @constructor.WEIGHTLIMIT
-        debug chalk.grey "current weight #{nweight} > #{@constructor.WEIGHTLIMIT},
-        waiting #{@constructor.WAIT}s..."
+      if @constructor.weight isnt 0 and nweight > @constructor.config.start.limit
+        debug chalk.grey "current weight #{nweight} > #{@constructor.config.start.limit},
+        waiting #{@constructor.config.start.interval}s..."
         @constructor.queue++
-        @emit 'wait', @constructor.WAIT * 1000
-        return setTimeout (=> @loadcheck cb), @constructor.WAIT * 1000
+        @emit 'wait', @constructor.config.start.interval
+        return setTimeout (=> @loadcheck cb), @constructor.config.start.interval
       @constructor.weight = nweight
       return cb()
     # rerun check after timeout
@@ -142,9 +144,14 @@ class Spawn extends EventEmitter
 
   # ### Start the process
   run: (cb) ->
+    # wait till configuration is loaded
+    if @constructor.configClass? and not @constructor.configClass.loaded
+      return @constructor.configClass.load (err) =>
+        return cb err if err
+        @run cb
     # update config
-    @config.priority ?= @constructor.priority
-    @config.retry ?= @constructor.retry
+    @config.priority ?= @constructor.config.defaults.priority
+    @config.retry ?= @constructor.config.defaults.retry
     # init internal variables
     @retrycount = 0
     @priority = @config.priority

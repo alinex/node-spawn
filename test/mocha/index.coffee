@@ -5,6 +5,7 @@ require('alinex-error').install()
 describe "Spawn wrapper", ->
 
   Spawn = require '../../lib/index'
+  Spawn.init()
 
   describe "class", ->
 

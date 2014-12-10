@@ -5,12 +5,12 @@
 # This maybe changed per machine.
 load:
   limit: 1 # limit system load (limit will be between 0.8*LOAD and 4*LOAD)
-  wait: 3 # wait between WAIT seconds and WAIT minutes + queue size
+  wait: 3s # wait between WAIT seconds and WAIT minutes + queue size
 
 # ### Start limit
 # The weight which can be started per each start period
 start:
-  interval: 1 # time for each period in seconds
+  interval: 1s # time for each period in seconds
   limit: 8 # weight allowed for each period (default is interval * cpus)
 
 # Specific weights for each command:
@@ -26,7 +26,7 @@ weight:
 
 # ### Process defaults
 # Values used if nothing specified in process itself.
-default:
+defaults:
   priority: 0.3   # default priority if none given
   retry: 5 # default number of retries
 
