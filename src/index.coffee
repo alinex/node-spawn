@@ -33,6 +33,9 @@ class Spawn extends EventEmitter
     # set config from different values
     if typeof @config is 'string'
       @config = Config.instance @config
+      # add the module's directory the default
+      @config.search.unshift path.resolve __dirname, 'var/src/config'
+      # add the check methods
       @config.setCheck configcheck
     if @config instanceof Config
       @configClass = @config
@@ -147,7 +150,6 @@ class Spawn extends EventEmitter
     # start initializing, if not done
     unless Spawn.initDone?
       return Spawn.init null, => @run cb
-      #cb new Error "Spawn is not initialized, call `Spawn.init();` first."
     # wait till configuration is loaded
     if @constructor.configClass? and not @constructor.configClass.loaded
       return @constructor.configClass.load (err) =>
