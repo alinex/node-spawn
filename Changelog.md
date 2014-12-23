@@ -4,6 +4,15 @@ Version changes
 The following list gives a short overview about what is changed between
 individual versions:
 
+Version 0.1.4 (2014-12-23)
+-------------------------------------------------
+- Added search for configs in this package.
+- Documented the configuration changes.
+- Fixed configuration loading.
+- Extracted configuration into file.
+- Added configuration file.
+- Allow newer sub packages.
+
 Version 0.1.3 (2014-12-09)
 -------------------------------------------------
 - 
