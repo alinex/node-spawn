@@ -86,6 +86,9 @@
         <a href="#events">Events</a>
       </div>
       <div class="heading h2">
+        <a href="#problems">Problems</a>
+      </div>
+      <div class="heading h2">
         <a href="#license">License</a>
       </div>
     </div>
@@ -153,6 +156,15 @@ use the events.</p>
 
 
 <div class="highlight"><pre><code><span class="nx">Spawn</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;alinex-spawn&#39;</span><span class="p">);</span>
+<span class="nx">Spawn</span><span class="p">.</span><span class="nx">init</span><span class="p">();</span> <span class="err">#</span> <span class="nx">optional</span> <span class="nx">loading</span> <span class="nx">spawn</span><span class="p">...</span> <span class="nx">config</span>
+</code></pre></div>
+
+
+
+<p>You may also load a specific configuration like:</p>
+
+
+<div class="highlight"><pre><code><span class="nx">Spawn</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">);</span>
 </code></pre></div>
 
 
@@ -313,15 +325,12 @@ didn't failed.</p>
 
 
 <p>You don't have to do anything for load handling, it comes out of the box but you
-may customize it for your machine:</p>
+may customize it for your machine in the configuration file.</p>
 
-
-<div class="highlight"><pre><code><span class="err">#</span> <span class="nx">This</span> <span class="nx">maybe</span> <span class="nx">changed</span> <span class="nx">per</span> <span class="nx">machine</span><span class="p">.</span>
-<span class="nx">Spawn</span><span class="p">.</span><span class="nx">LOAD</span> <span class="o">=</span> <span class="mi">1</span>   <span class="err">#</span> <span class="nx">limit</span> <span class="nx">system</span> <span class="nx">load</span> <span class="p">(</span><span class="nx">limit</span> <span class="nx">will</span> <span class="nx">be</span> <span class="nx">between</span> <span class="mf">0.8</span><span class="o">*</span><span class="nx">LOAD</span> <span class="nx">and</span> <span class="mi">4</span><span class="o">*</span><span class="nx">LOAD</span><span class="p">)</span>
-<span class="nx">Spawn</span><span class="p">.</span><span class="nx">WAIT</span> <span class="o">=</span> <span class="mi">10</span>  <span class="err">#</span> <span class="nx">wait</span> <span class="nx">between</span> <span class="nx">WAIT</span> <span class="nx">seconds</span> <span class="nx">and</span> <span class="nx">WAIT</span> <span class="nx">minutes</span> <span class="o">+</span> <span class="nx">queue</span> <span class="nx">size</span>
-</code></pre></div>
-
-
+<p>You may also add specific settings dynamically after loading
+    # This maybe changed per machine.
+    Spawn.LOAD = 1   # limit system load (limit will be between 0.8<em>LOAD and 4</em>LOAD)
+    Spawn.WAIT = 10  # wait between WAIT seconds and WAIT minutes + queue size</p>
 
 <p>See the detailed explanation below to see what each value means. Also you may
 specify what the limit of processes for each start period will be.</p>
@@ -531,18 +540,7 @@ normal system process (nice=0).</p>
 
 
 <ul>
-<li><code>LOAD</code> (float) - limit system load (limit will be between 0.8<em>LOAD and 4</em>LOAD)</li>
-<li><code>WAIT</code> (float) - wait between WAIT seconds and WAIT minutes + queue size</li>
-<li><code>WEIGHTTIME</code> (float) - time for each period in seconds</li>
-<li><code>WEIGHTLIMIT</code> (float) - size of load allowed for each period</li>
-<li><code>WEIGHT</code> (object) - map of weight values for each command</li>
-</ul>
-
-<p>Default values:</p>
-
-<ul>
-<li><code>retry</code> (integer) - default number of retries</li>
-<li><code>priority</code> (float) - default priority</li>
+<li><code>ìnit(config, cb);</code> - initialize the spawn class</li>
 </ul>
 
 
@@ -555,6 +553,9 @@ normal system process (nice=0).</p>
 
 
 <ul>
+<li><code>config</code> (object) - configuration settings for the machine</li>
+<li><code>configClass</code> (Config) - alinex-config instance which loaded the configuration</li>
+<li><code>initDone</code> (boolean) - flag indication the class is initialized</li>
 <li><code>time</code> (integer) - current time period</li>
 <li><code>weight</code> (float) - already used weight in this time period</li>
 <li><code>queue</code> (integer) - number of processes in queue</li>
@@ -649,6 +650,20 @@ again.</p>
 <li><code>wait</code> (integer) - if the process is paused given seconds</li>
 <li><code>retry</code> (integer) - if the process will be retried after given seconds</li>
 </ul>
+
+
+<div class="pilwrap" id="problems">
+  <h2>
+    <a href="#problems" name="problems" class="pilcrow">&#182;</a>
+    Problems
+  </h2>
+</div>
+
+
+<p>If you get the message that too much event listeners are set on the config
+class and this may be a memory leak. You started to much processes while the
+config is not fully loaded. Better use the <code>Spawn.init()</code> method with a
+callback to wait for the initialization before starting.</p>
 
 
 <div class="pilwrap" id="license">

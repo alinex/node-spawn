@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>spawn.yml</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="../../../doc-style.css" />
+  <script src="../../../doc-filelist.js"></script>
+  <script>
+    var relativeDir = "../../../", thisFile = "home/alex/a3/node-spawn/var/src/config/spawnyml", defaultSidebar = true;
+  </script>
+  <script src="../../../doc-script.js"></script>
+  <script src="../../../fileSearch.js"></script>
+  <script src="../../../goToLine.js"></script>
+  <link rel="stylesheet" href="../../../fileSearch.css" />
+  <link rel="stylesheet" href="../../../goToLine.css" />
+</head>
+<body>
+  <div id="sidebar_wrapper">
+    <div id="sidebar_switch">
+      <span class="tree">Files</span>
+      <span class="headings">Headings</span>
+    </div>
+    <div id="tree"></div>
+    <div id="headings">
+      <div class="heading h1">
+        <a href="#setup%20for%20spawn%20load">Setup for spawn load</a>
+      </div>
+      <div class="heading h2">
+        <a href="#%2B%23%20maximum%20load%20handling">+# Maximum load handling</a>
+      </div>
+      <div class="heading h3">
+        <a href="#start%20limit">Start limit</a>
+      </div>
+      <div class="heading h3">
+        <a href="#process%20defaults">Process defaults</a>
+      </div>
+    </div>
+  </div>
+  <div id="sidebar-toggle"></div>
+  <div id="container"><a id="fork" href="https://github.com/alinex/node-spawn" title="Fork me on GitHub"></a><div class="background highlight"></div>
+<table cellpadding="0" cellspacing="0">
+  <tbody>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="setup%20for%20spawn%20load">
+  <h1>
+    <a href="#setup%20for%20spawn%20load" name="setup%20for%20spawn%20load" class="pilcrow">&#182;</a>
+    Setup for spawn load
+  </h1>
+</div>
+
+
+<p>Default settings to fully use a machine.</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre></pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="%2B%23%20maximum%20load%20handling">
+  <h2>
+    <a href="#%2B%23%20maximum%20load%20handling" name="%2B%23%20maximum%20load%20handling" class="pilcrow">&#182;</a>
+    +# Maximum load handling
+  </h2>
+</div>
+
+
+<p>This maybe changed per machine.</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+<span class="l-Scalar-Plain">load</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">limit</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1</span> <span class="c1"># limit system load (limit will be between 0.8*LOAD and 4*LOAD)</span>
+  <span class="l-Scalar-Plain">wait</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">3s</span> <span class="c1"># wait between WAIT seconds and WAIT minutes + queue size</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="start%20limit">
+  <h3>
+    <a href="#start%20limit" name="start%20limit" class="pilcrow">&#182;</a>
+    Start limit
+  </h3>
+</div>
+
+
+<p>The weight which can be started per each start period</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+<span class="l-Scalar-Plain">start</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">interval</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">1s</span> <span class="c1"># time for each period in seconds</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-4" id="section-4">&#182;</a>
+</div>
+<p>limit: 8 # weight allowed for each period (default is interval * cpus)</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-5" id="section-5">&#182;</a>
+</div>
+<p>Specific weights for each command:</p>
+
+<p>A weight of 1 means that it normally may be started 1/sec and cpu.
+If you have a setting above the WEIGHTLIMIT it is started only as first
+of a time period. Best way is to have the weights &lt; WEIGHTLIMIT to ensure
+proper priority handling.</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+<span class="l-Scalar-Plain">weight</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">DEFAULT</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">0.2</span>
+  <span class="l-Scalar-Plain">ffmpeg</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">10</span>
+  <span class="l-Scalar-Plain">lame</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">10</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="process%20defaults">
+  <h3>
+    <a href="#process%20defaults" name="process%20defaults" class="pilcrow">&#182;</a>
+    Process defaults
+  </h3>
+</div>
+
+
+<p>Values used if nothing specified in process itself.</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+<span class="l-Scalar-Plain">defaults</span><span class="p-Indicator">:</span>
+  <span class="l-Scalar-Plain">priority</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">0.3</span>   <span class="c1"># default priority if none given</span>
+  <span class="l-Scalar-Plain">retry</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">5</span> <span class="c1"># default number of retries</span>
+</pre></div>
+        </td>
+      </tr>
+  </tbody>
+</table>
+  </div>
+</body>
+</html>
