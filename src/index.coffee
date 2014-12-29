@@ -34,7 +34,7 @@ class Spawn extends EventEmitter
     if typeof @config is 'string'
       @config = Config.instance @config
       # add the module's directory the default
-      @config.search.unshift path.resolve __dirname, 'var/src/config'
+      @config.search.unshift path.resolve path.dirname(__dirname), 'var/src/config'
       # add the check methods
       @config.setCheck configcheck
     if @config instanceof Config
