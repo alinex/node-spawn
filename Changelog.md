@@ -4,6 +4,10 @@ Version changes
 The following list gives a short overview about what is changed between
 individual versions:
 
+Version 0.1.5 (2015-01-07)
+-------------------------------------------------
+- Fixed search path for own configs.
+
 Version 0.1.4 (2014-12-23)
 -------------------------------------------------
 - Added search for configs in this package.

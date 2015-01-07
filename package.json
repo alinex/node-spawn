@@ -1,6 +1,6 @@
 {
   "name": "alinex-spawn",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Extended version of the process.spawn method",
   "copyright": "Alexander Schilling 2014",
   "private": false,
