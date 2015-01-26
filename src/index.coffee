@@ -28,6 +28,8 @@ ERRORDETECT = /Error:\s((\w| )+)/i
 # -------------------------------------------------
 class Spawn extends EventEmitter
 
+  @configcheck: configcheck
+
   @init: (@config = 'spawn', cb) ->
     debug "init or reinit spawn"
     # set config from different values
