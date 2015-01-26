@@ -31,18 +31,26 @@ class Spawn extends EventEmitter
   @configcheck: configcheck
 
   @init: (@config = 'spawn', cb) ->
-    debug "init or reinit spawn"
-    # set config from different values
-    if typeof @config is 'string'
-      @config = Config.instance @config
-      # add the module's directory as default
-      @config.search.unshift path.resolve path.dirname(__dirname), 'var/src/config'
-      # add the check methods
-      @config.setCheck configcheck
-    if @config instanceof Config
-      @configClass = @config
-      @config = @configClass.data
-    @initDone = false # status set to true after initializing
+    # return if already initialized
+    if @initDone
+      cb() if cb
+      return
+    # start new initialization if not running
+    unless @initStart
+      @initStart = true
+      debug "init or reinit spawn"
+      # set config from different values
+      if typeof @config is 'string'
+        @config = Config.instance @config
+        # add the module's directory as default
+        @config.search.unshift path.resolve path.dirname(__dirname)
+        , 'var/src/config'
+        # add the check methods
+        @config.setCheck configcheck
+      if @config instanceof Config
+        @configClass = @config
+        @config = @configClass.data
+      @initDone = false # status set to true after initializing
     # set init status if configuration is loaded
     unless @configClass?
       cb() if cb?
