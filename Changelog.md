@@ -4,6 +4,13 @@ Version changes
 The following list gives a short overview about what is changed between
 individual versions:
 
+Version 0.1.6 (2015-02-03)
+-------------------------------------------------
+- Added local configs to search path if used as module, also.
+- Fixed Spawn initialization to prevent parallel runs.
+- Make configcheck public available.
+- Spellchecked inline comment.
+
 Version 0.1.5 (2015-01-07)
 -------------------------------------------------
 - Fixed search path for own configs.
