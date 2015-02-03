@@ -177,8 +177,9 @@ command.</p>
         <td class="code highlight"><div class="highlight"><pre>
 <span class="k">class</span> <span class="nx">Spawn</span> <span class="k">extends</span> <span class="nx">EventEmitter</span>
 
+  <span class="vi">@configcheck: </span><span class="nx">configcheck</span>
+
   <span class="vi">@init: </span><span class="nf">(@config = &#39;spawn&#39;, cb) -&gt;</span>
-    <span class="nx">debug</span> <span class="s">&quot;init or reinit spawn&quot;</span>
 
 </pre></div>
         </td>
@@ -188,11 +189,12 @@ command.</p>
 <div class="pilwrap">
   <a class="pilcrow" href="#section-8" id="section-8">&#182;</a>
 </div>
-<p>set config from different values</p>
+<p>return if already initialized</p>
         </td>
         <td class="code highlight"><div class="highlight"><pre>
-    <span class="k">if</span> <span class="k">typeof</span> <span class="nx">@config</span> <span class="o">is</span> <span class="s">&#39;string&#39;</span>
-      <span class="vi">@config = </span><span class="nx">Config</span><span class="p">.</span><span class="nx">instance</span> <span class="nx">@config</span>
+    <span class="k">if</span> <span class="nx">@initDone</span>
+      <span class="nx">cb</span><span class="p">()</span> <span class="k">if</span> <span class="nx">cb</span>
+      <span class="k">return</span>
 
 </pre></div>
         </td>
@@ -202,10 +204,12 @@ command.</p>
 <div class="pilwrap">
   <a class="pilcrow" href="#section-9" id="section-9">&#182;</a>
 </div>
-<p>add the module's directory the default</p>
+<p>start new initialization if not running</p>
         </td>
         <td class="code highlight"><div class="highlight"><pre>
-      <span class="nx">@config</span><span class="p">.</span><span class="nx">search</span><span class="p">.</span><span class="nx">unshift</span> <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">__dirname</span><span class="p">,</span> <span class="s">&#39;var/src/config&#39;</span>
+    <span class="k">unless</span> <span class="nx">@initStart</span>
+      <span class="vi">@initStart = </span><span class="kc">true</span>
+      <span class="nx">debug</span> <span class="s">&quot;init or reinit spawn&quot;</span>
 
 </pre></div>
         </td>
@@ -215,14 +219,11 @@ command.</p>
 <div class="pilwrap">
   <a class="pilcrow" href="#section-10" id="section-10">&#182;</a>
 </div>
-<p>add the check methods</p>
+<p>set config from different values</p>
         </td>
         <td class="code highlight"><div class="highlight"><pre>
-      <span class="nx">@config</span><span class="p">.</span><span class="nx">setCheck</span> <span class="nx">configcheck</span>
-    <span class="k">if</span> <span class="nx">@config</span> <span class="k">instanceof</span> <span class="nx">Config</span>
-      <span class="vi">@configClass = </span><span class="nx">@config</span>
-      <span class="vi">@config = </span><span class="nx">@configClass</span><span class="p">.</span><span class="nx">data</span>
-    <span class="vi">@initDone = </span><span class="kc">false</span> <span class="c1"># status set to true after initializing</span>
+      <span class="k">if</span> <span class="k">typeof</span> <span class="nx">@config</span> <span class="o">is</span> <span class="s">&#39;string&#39;</span>
+        <span class="vi">@config = </span><span class="nx">Config</span><span class="p">.</span><span class="nx">instance</span> <span class="nx">@config</span>
 
 </pre></div>
         </td>
@@ -231,6 +232,37 @@ command.</p>
         <td class="docs">
 <div class="pilwrap">
   <a class="pilcrow" href="#section-11" id="section-11">&#182;</a>
+</div>
+<p>add the module's directory as default</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+        <span class="nx">@config</span><span class="p">.</span><span class="nx">search</span><span class="p">.</span><span class="nx">unshift</span> <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">path</span><span class="p">.</span><span class="nx">dirname</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">),</span> <span class="s">&#39;var/local/config&#39;</span>
+        <span class="nx">@config</span><span class="p">.</span><span class="nx">search</span><span class="p">.</span><span class="nx">unshift</span> <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">path</span><span class="p">.</span><span class="nx">dirname</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">),</span> <span class="s">&#39;var/src/config&#39;</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-12" id="section-12">&#182;</a>
+</div>
+<p>add the check methods</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+        <span class="nx">@config</span><span class="p">.</span><span class="nx">setCheck</span> <span class="nx">configcheck</span>
+      <span class="k">if</span> <span class="nx">@config</span> <span class="k">instanceof</span> <span class="nx">Config</span>
+        <span class="vi">@configClass = </span><span class="nx">@config</span>
+        <span class="vi">@config = </span><span class="nx">@configClass</span><span class="p">.</span><span class="nx">data</span>
+      <span class="vi">@initDone = </span><span class="kc">false</span> <span class="c1"># status set to true after initializing</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-13" id="section-13">&#182;</a>
 </div>
 <p>set init status if configuration is loaded</p>
         </td>
@@ -246,7 +278,7 @@ command.</p>
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-12" id="section-12">&#182;</a>
+  <a class="pilcrow" href="#section-14" id="section-14">&#182;</a>
 </div>
 <p>wait till configuration is loaded</p>
         </td>
@@ -263,7 +295,7 @@ command.</p>
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-13" id="section-13">&#182;</a>
+  <a class="pilcrow" href="#section-15" id="section-15">&#182;</a>
 </div>
 <p>overall runtime information</p>
         </td>
@@ -403,7 +435,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-20" id="section-20">&#182;</a>
+  <a class="pilcrow" href="#section-22" id="section-22">&#182;</a>
 </div>
 <p>try to get detailed error message</p>
         </td>
@@ -421,12 +453,12 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-21" id="section-21">&#182;</a>
+  <a class="pilcrow" href="#section-23" id="section-23">&#182;</a>
 </div>
 <p>create error message</p>
         </td>
         <td class="code highlight"><div class="highlight"><pre>
-      <span class="k">new</span> <span class="nb">Error</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">msg</span><span class="si">}</span><span class="s"> in &#39;</span><span class="si">#{</span><span class="nx">proc</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="s">&#39;.&quot;</span>
+      <span class="k">return</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">msg</span><span class="si">}</span><span class="s"> in &#39;</span><span class="si">#{</span><span class="nx">proc</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="s">&#39;.&quot;</span>
 
 
 </pre></div>
@@ -489,7 +521,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-25" id="section-25">&#182;</a>
+  <a class="pilcrow" href="#section-27" id="section-27">&#182;</a>
 </div>
 <p>load is ok, but check current added weight</p>
         </td>
@@ -502,7 +534,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-26" id="section-26">&#182;</a>
+  <a class="pilcrow" href="#section-28" id="section-28">&#182;</a>
 </div>
 <p>reset weight if new time (unit=10s)</p>
         </td>
@@ -518,7 +550,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-27" id="section-27">&#182;</a>
+  <a class="pilcrow" href="#section-29" id="section-29">&#182;</a>
 </div>
 <p>calculate new weight</p>
         </td>
@@ -535,7 +567,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-28" id="section-28">&#182;</a>
+  <a class="pilcrow" href="#section-30" id="section-30">&#182;</a>
 </div>
 <p>check new weight > limit (timeout 1000)</p>
         </td>
@@ -555,7 +587,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-29" id="section-29">&#182;</a>
+  <a class="pilcrow" href="#section-31" id="section-31">&#182;</a>
 </div>
 <p>rerun check after timeout</p>
         </td>
@@ -591,7 +623,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-31" id="section-31">&#182;</a>
+  <a class="pilcrow" href="#section-33" id="section-33">&#182;</a>
 </div>
 <p>start initializing, if not done</p>
         </td>
@@ -605,7 +637,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-32" id="section-32">&#182;</a>
+  <a class="pilcrow" href="#section-34" id="section-34">&#182;</a>
 </div>
 <p>wait till configuration is loaded</p>
         </td>
@@ -621,7 +653,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-33" id="section-33">&#182;</a>
+  <a class="pilcrow" href="#section-35" id="section-35">&#182;</a>
 </div>
 <p>update config</p>
         </td>
@@ -635,7 +667,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-34" id="section-34">&#182;</a>
+  <a class="pilcrow" href="#section-36" id="section-36">&#182;</a>
 </div>
 <p>init internal variables</p>
         </td>
@@ -650,7 +682,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-35" id="section-35">&#182;</a>
+  <a class="pilcrow" href="#section-37" id="section-37">&#182;</a>
 </div>
 <p>check system load</p>
         </td>
@@ -666,7 +698,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-36" id="section-36">&#182;</a>
+  <a class="pilcrow" href="#section-38" id="section-38">&#182;</a>
 </div>
 <p>check configuration</p>
         </td>
@@ -686,7 +718,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-37" id="section-37">&#182;</a>
+  <a class="pilcrow" href="#section-39" id="section-39">&#182;</a>
 </div>
 <p>cleanup result</p>
         </td>
@@ -701,7 +733,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-38" id="section-38">&#182;</a>
+  <a class="pilcrow" href="#section-40" id="section-40">&#182;</a>
 </div>
 <p>create new subprocess</p>
         </td>
@@ -717,7 +749,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-39" id="section-39">&#182;</a>
+  <a class="pilcrow" href="#section-41" id="section-41">&#182;</a>
 </div>
 <p>add support for nice call</p>
         </td>
@@ -741,7 +773,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-40" id="section-40">&#182;</a>
+  <a class="pilcrow" href="#section-42" id="section-42">&#182;</a>
 </div>
 <p>collect output</p>
         </td>
@@ -759,7 +791,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-41" id="section-41">&#182;</a>
+  <a class="pilcrow" href="#section-43" id="section-43">&#182;</a>
 </div>
 <p>copy into general buffer after line completed</p>
         </td>
@@ -782,7 +814,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-42" id="section-42">&#182;</a>
+  <a class="pilcrow" href="#section-44" id="section-44">&#182;</a>
 </div>
 <p>copy into general buffer after line completed</p>
         </td>
@@ -800,7 +832,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-43" id="section-43">&#182;</a>
+  <a class="pilcrow" href="#section-45" id="section-45">&#182;</a>
 </div>
 <p>cleanup buffers</p>
         </td>
@@ -821,7 +853,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-44" id="section-44">&#182;</a>
+  <a class="pilcrow" href="#section-46" id="section-46">&#182;</a>
 </div>
 <p>error management</p>
         </td>
@@ -841,7 +873,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-45" id="section-45">&#182;</a>
+  <a class="pilcrow" href="#section-47" id="section-47">&#182;</a>
 </div>
 <p>process finished</p>
         </td>
@@ -884,7 +916,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-47" id="section-47">&#182;</a>
+  <a class="pilcrow" href="#section-49" id="section-49">&#182;</a>
 </div>
 <p>end of retries</p>
         </td>
