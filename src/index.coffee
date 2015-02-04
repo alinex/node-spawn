@@ -109,7 +109,7 @@ class Spawn extends EventEmitter
         match = proc.stdout.match ERRORDETECT
         msg += ' caused by ' + match[1] if match
       # create error message
-      new Error "#{msg} in '#{proc.name}'."
+      return new Error "#{msg} in '#{proc.name}'."
 
   # Instance methods
   # -------------------------------------------------
