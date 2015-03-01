@@ -205,7 +205,9 @@ class Spawn extends EventEmitter
         cwd: @config.cwd
         env: @config.env
         uid: @config.uid
-        gif: @config.gid
+        gid: @config.gid
+        input: @config.input
+        stdio: @config.stdio
       @pid = @proc.pid
       debugCmd "[#{@pid}] #{@config.cmd} #{(@config.args ? []).join ' '}"
       # collect output
