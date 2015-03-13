@@ -117,6 +117,7 @@ class Spawn extends EventEmitter
   # ### Create instance
   constructor: (@config) ->
     @config.check = @constructor.check unless @config.check
+    throw new Error "No command given for spawn" unless config.cmd
 
   # ### Check if it can start
   loadcheck: (cb) =>
