@@ -2,7 +2,6 @@ Package: alinex-spawn
 =================================================
 
 [![Build Status] (https://travis-ci.org/alinex/node-spawn.svg?branch=master)](https://travis-ci.org/alinex/node-spawn)
-[![Coverage Status] (https://coveralls.io/repos/alinex/node-spawn/badge.png?branch=master)](https://coveralls.io/r/alinex/node-spawn?branch=master)
 [![Dependency Status] (https://gemnasium.com/alinex/node-spawn.png)](https://gemnasium.com/alinex/node-spawn)
 
 This is an object oriented implementation around the core `process.spawn`
@@ -23,7 +22,9 @@ Install
 
 The easiest way is to let npm add the module directly:
 
-    > npm install alinex-spawn --save
+``` sh
+npm install alinex-spawn --save
+```
 
 [![NPM](https://nodei.co/npm/alinex-spawn.png?downloads=true&stars=true)](https://nodei.co/npm/alinex-spawn/)
 
@@ -35,22 +36,29 @@ use the events.
 
 First you have to load the class package.
 
-    Spawn = require('alinex-spawn');
-    Spawn.init(); # optional loading spawn... config
+``` coffee
+Spawn = require 'alinex-spawn'
+Spawn.init() # optional loading spawn... config
+```
 
 You may also load a specific configuration like:
 
-    Spawn.init('spawn');
+``` coffee
+Spawn.init 'spawn'
+```
 
 Now you may setup an external process like:
 
-    proc = new Spawn {
-      cmd: 'date'
-    };
+``` coffee
+proc = new Spawn
+  cmd: 'date'
+```
 
 You may also change the configuration afterwards like:
 
-    proc.config.cmd = 'date';
+``` coffee
+proc.config.cmd = 'date'
+```
 
 Now you have multiple ways to work and control your process.
 
@@ -58,9 +66,10 @@ Now you have multiple ways to work and control your process.
 
 To run this simple process call the run-method:
 
-    proc.run(function(err, stdout, stderr, code) {
-      // work with the results
-    });
+``` coffee
+proc.run (err, stdout, stderr, code) ->
+  # work with the results
+```
 
 After the process has completed its task the callback will be called with the
 most used data. But you may access all details through the `proc` object.
@@ -69,16 +78,15 @@ most used data. But you may access all details through the `proc` object.
 
 With events you can monitor what's going on while the process works.
 
-    proc.run();
+``` coffee
+proc.run()
 
-    stdout = '';
-    proc.on('stdout', function(data) {
-      return stdout += data;
-    });
-
-    proc.on('done', function() {
-      // analyse the results
-    });
+stdout = ''
+proc.on 'stdout', (data) ->
+  stdout += data
+proc.on 'done', ->
+  # analyse the results
+```
 
 ### Check for Success
 
@@ -89,28 +97,27 @@ the output will be generated.
 You may give a different check method in the configuration which will be used to
 check whether the process succeeded and return an Error or undefined:
 
-    proc.config.check = function(proc) {
-      if (!((proc.code != null) && proc.code === 0)) {
-        return new Error("Got exit code of " + proc.code + ".");
-      }
-    };
+``` coffee
+proc.config.check = (proc) ->
+  return new Error "Got exit code of #{proc.code}" if proc.code
+```
 
 You may also make some ḱind of filter which specifies some known errors:
 
-    proc.config.check = function(proc) {
-      if (proc.stdout.match(/Error: Unknown file type/)) {
-        return null;
-      }
-      # else use general check
-      return proc.constructor.check(proc);
-    };
+``` coffee
+proc.config.check = (proc) ->
+  return if proc.stdout.match /Error: Unknown file type/
+  # else use general check
+  return proc.constructor.check proc
+```
 
 This check will automatically be called on normal process close. If you want to
 know if it got an error you can use the event or callback value or check for:
 
-    if (proc.error != null) {
-      // something went wrong
-    }
+``` coffee
+if proc.error
+  # something went wrong
+```
 
 If a check went wrong the process will be scheduled for retry after the following
 time (time=retry ^ 3):
@@ -133,8 +140,9 @@ didn't failed.
 
 To disable retrying use the configuration:
 
-    proc.config.retry = 0
-
+``` coffee
+proc.config.retry = 0
+```
 
 ### Use load handling and priorities
 
@@ -142,22 +150,29 @@ You don't have to do anything for load handling, it comes out of the box but you
 may customize it for your machine in the configuration file.
 
 You may also add specific settings dynamically after loading
-    # This maybe changed per machine.
-    Spawn.LOAD = 1   # limit system load (limit will be between 0.8*LOAD and 4*LOAD)
-    Spawn.WAIT = 10  # wait between WAIT seconds and WAIT minutes + queue size
+
+``` coffee
+# This maybe changed per machine.
+Spawn.LOAD = 1   # limit system load (limit will be between 0.8*LOAD and 4*LOAD)
+Spawn.WAIT = 10  # wait between WAIT seconds and WAIT minutes + queue size
+```
 
 See the detailed explanation below to see what each value means. Also you may
 specify what the limit of processes for each start period will be.
 
-    # The weight which can be started per each start period
-    Spawn.WEIGHTTIME = 10   # time for each period in seconds
-    Spawn.WEIGHTLIMIT = 10  # size of load allowed for each period
+``` coffee
+# The weight which can be started per each start period
+Spawn.WEIGHTTIME = 10   # time for each period in seconds
+Spawn.WEIGHTLIMIT = 10  # size of load allowed for each period
+```
 
 If you use non standard commands you may help the system balancing the start by
 giving each command a specific weight. Some default commands are already defined.
 
-    # Specific weights for each command
-    Spawn.WEIGHT.SITMarkAVMulticontainerFFmpeg = 500
+``` coffee
+# Specific weights for each command
+Spawn.WEIGHT.SITMarkAVMulticontainerFFmpeg = 500
+```
 
 A weight of 1 means that it normally may be started 1/sec.
 If you have a setting above the WEIGHTLIMIT it is started only as first
@@ -196,7 +211,9 @@ Therefore the system will check the current system load. To get a comparable
 value the load as displayed in the `top` command will be harmonized by dividing
 it through the number of cpu cores.
 
-    load = short-load / num-cpus
+``` coffee
+load = short-load / num-cpus
+```
 
 So a load of 1 meaning every core has to do enough in the moment, but a system
 may also have more things to do (meaning they are in the system's queue) as the
