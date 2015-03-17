@@ -9,6 +9,9 @@
 # include base modules
 debug = require('debug')('spawn')
 debugCmd = require('debug')('spawn:cmd')
+debugOut = require('debug')('spawn:out')
+debugErr = require('debug')('spawn:err')
+debugBalance = require('debug')('spawn:balance')
 chalk = require 'chalk'
 {spawn} = require 'child_process'
 EventEmitter = require('events').EventEmitter
@@ -28,39 +31,17 @@ ERRORDETECT = /Error:\s((\w| )+)/i
 # -------------------------------------------------
 class Spawn extends EventEmitter
 
-  @configcheck: configcheck
-
-  @init: (@config = 'spawn', cb) ->
-    # return if already initialized
-    if @initDone
-      cb() if cb
-      return
-    # start new initialization if not running
-    unless @initStart
-      @initStart = true
-      debug "init or reinit spawn"
-      # set config from different values
-      if typeof @config is 'string'
-        @config = Config.instance @config
-        # add the module's directory as default
-        @config.search.unshift path.resolve path.dirname(__dirname), 'var/local/config'
-        @config.search.unshift path.resolve path.dirname(__dirname), 'var/src/config'
-        # add the check methods
-        @config.setCheck configcheck
-      if @config instanceof Config
-        @configClass = @config
-        @config = @configClass.data
-      @initDone = false # status set to true after initializing
-    # set init status if configuration is loaded
-    unless @configClass?
-      cb() if cb?
-      @initDone = true
-    else
-      # wait till configuration is loaded
-      @configClass.load (err) =>
-        console.error err if err
-        cb err if cb?
-        @initDone = true
+  @init: (config = 'spawn', cb) ->
+    return cb() if @config # already loaded
+    @_configSource ?= config # store what to load
+    # start resolving configuration
+    Config.get @_configSource, [
+      path.resolve path.dirname(__dirname), 'var/src/config'
+      path.resolve path.dirname(__dirname), 'var/local/config'
+    ], configcheck, (err, @config) ->
+      # results stored, now check for errors
+      console.error err if err
+      cb err if cb?
 
   # overall runtime information
   @weight: 0
@@ -98,7 +79,7 @@ class Spawn extends EventEmitter
 
   # ### General check method
   # This is used if no other check method given.
-  @check = (proc) ->
+  @checkExitCode = (proc) ->
     unless proc.code? and proc.code is 0
       msg = "Got exit code of #{proc.code}"
       # try to get detailed error message
@@ -116,12 +97,12 @@ class Spawn extends EventEmitter
 
   # ### Create instance
   constructor: (@config) ->
-    @config.check = @constructor.check unless @config.check
+    @config.check = @constructor.checkExitCode unless @config.check
     throw new Error "No command given for spawn" unless config.cmd
 
   # ### Check if it can start
   loadcheck: (cb) =>
-    return cb() if @priority > 1 # run immediately
+    return cb() unless @config.balance # run immediately
     @constructor.queue--
     load = os.loadavg()[0] / os.cpus().length
     limit = @constructor.load @priority
@@ -140,7 +121,7 @@ class Spawn extends EventEmitter
         @constructor.weight + @constructor.config.weight.DEFAULT
       # check new weight > limit (timeout 1000)
       if @constructor.weight isnt 0 and nweight > @constructor.config.start.limit
-        debug chalk.grey "current weight #{nweight} > #{@constructor.config.start.limit},
+        debugBalance chalk.grey "current weight #{nweight} > #{@constructor.config.start.limit},
         waiting #{~~(@constructor.config.start.interval/1000)}s..."
         @constructor.queue++
         @emit 'wait', @constructor.config.start.interval
@@ -151,31 +132,23 @@ class Spawn extends EventEmitter
     @priority = @constructor.priorityup @priority
     wait =  @constructor.loadtimeout @priority, load/limit
     wait += @constructor.queue*10 # add 10ms waiting time for each job in queue
-    debug chalk.grey "load #{load.toFixed 2} > #{limit.toFixed 2} (p=#{@priority.toFixed 2}), waiting #{~~(wait/1000)}s"
+    debugBalance chalk.grey "load #{load.toFixed 2} > #{limit.toFixed 2} (p=#{@priority.toFixed 2}), waiting #{~~(wait/1000)}s"
     @constructor.queue++
     @emit 'wait', wait
     setTimeout (=> @loadcheck cb), wait
 
   # ### Start the process
   run: (cb) ->
-    # start initializing, if not done
-    unless Spawn.initDone?
-      return Spawn.init null, => @run cb
-    # wait till configuration is loaded
-    if @constructor.configClass? and not @constructor.configClass.loaded
-      return @constructor.configClass.load (err) =>
-        return cb err if err
-        @run cb
-    # update config
-    @config.priority ?= @constructor.config.defaults.priority
-    @config.retry ?= @constructor.config.defaults.retry
-    # init internal variables
-    @retrycount = 0
-    @priority = @config.priority
-    @name = @config.name ? "#{path.basename @config.cmd} #{(@config.args ? []).join ' '}"
-    # check system load
-    debug "add job #{@name}"
-    @_run cb
+    @constructor.init null, (err) ->
+      # update config
+      @config.balance ?= @constructor.config.defaults.balance
+      @config.priority ?= @constructor.config.defaults.priority
+      @config.retry ?= @constructor.config.defaults.retry
+      # init internal variables
+      @retrycount = 0
+      @priority = @config.priority
+      @name = @config.name ? "#{path.basename @config.cmd} #{(@config.args ? []).join ' '}"
+      @_run cb
 
   _run: (cb) ->
     # check configuration
@@ -224,7 +197,7 @@ class Spawn extends EventEmitter
           @stdout += text
           @emit 'stdout', text # send through
           for line in text.split /\n/
-            debugCmd chalk.grey "[#{@pid}] out: #{line}"
+            debugOut chalk.grey "[#{@pid}] #{line}"
       @proc.stderr.setEncoding "utf8"
       @proc.stderr.on 'data', (data) =>
         stderr += data.toString()
@@ -242,11 +215,11 @@ class Spawn extends EventEmitter
         if stdout
           @stdout = stdout
           @emit 'stdout', stdout
-          debugCmd chalk.grey "[#{@pid}] out: #{stdout}"
+          debugOut chalk.grey "[#{@pid}] #{stdout}"
         if stderr
           @stderr = stderr
           @emit 'stderr', stderr
-          debugCmd chalk.grey "[#{@pid}] out: #{stderr}"
+          debugErr chalk.grey "[#{@pid}] #{stderr}"
       # error management
       @proc.on 'error', (@err) =>
         if err.message is 'spawn EMFILE'
@@ -271,12 +244,12 @@ class Spawn extends EventEmitter
     @priority = @constructor.prioritydown @priority
     if  @retrycount < @config.retry
       wait = Math.pow(++@retrycount, 3) * 1000
-      debug "retry #{@retrycount+1}/#{@config.retry} in #{~~wait}s caused by #{@error}"
+      debug "retry #{@retrycount}/#{@config.retry} in #{~~wait}s caused by #{@error}"
       @emit 'retry', wait
       return setTimeout (=> @_run cb), wait
     # end of retries
     @emit 'error', @error
-    debugCmd chalk.red "[#{@pid}] #{@error.toString()}"
+    debug chalk.red "[#{@pid}] #{@error.toString()}"
     cb @error, @stdout, @stderr, @code if cb
 
 

@@ -304,11 +304,11 @@ API
 ### Class variables
 
 - `config` (object) - configuration settings for the machine
-- `configClass` (Config) - alinex-config instance which loaded the configuration
-- `initDone` (boolean) - flag indication the class is initialized
 - `time` (integer) - current time period
 - `weight` (float) - already used weight in this time period
 - `queue` (integer) - number of processes in queue
+- `checkExitCode()` - predefined function to use for instances
+
 
 ### Instantiate
 
@@ -336,6 +336,7 @@ See the `config` property below for what to be configured here.
   - uid (integer) - user identity of the process
   - gid (integer) - group identity of the process
   - check (function) - to check whether process succeeded
+  - balance (boolean) - set to true to use server load balancing
   - priority (float) - between 0..1
   - retry (integer) - number of possible retries
 

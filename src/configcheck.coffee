@@ -64,6 +64,11 @@ module.exports =
       type: 'object'
       allowedKeys: true
       entries:
+        balance:
+          title: "Load Balance"
+          description: "a flag indicating if load balancing be done by default"
+          type: 'boolean'
+          default: 'false'
         priority:
           title: "Default priority"
           description: "the priority for each process, higher means to run earlier"

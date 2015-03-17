@@ -28,6 +28,7 @@ weight:
 # ### Process defaults
 # Values used if nothing specified in process itself.
 defaults:
+  balance: false # should load balancing be on by default
   priority: 0.3   # default priority if none given
-  retry: 5 # default number of retries
+  retry: 3 # default number of retries
 
