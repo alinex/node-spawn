@@ -51,7 +51,7 @@ describe "Spawn wrapper", ->
         stdout += data
       proc.on 'done', ->
         expect(stdout, 'standard output').to.have.length.above 0
-        expect(stdout, 'standard output').to.equal proc.stdout
+        expect(stdout, 'standard output').to.equal proc.stdout.trim()
         expect(proc.stderr, 'error output').to.equal ''
         expect(proc.code, 'exit code').to.equal 0
         done()

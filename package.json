@@ -31,9 +31,10 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "alinex-config": "^0.3.2",
+    "alinex-config": "0.4.x",
+    "carrier": "0.1.x",
     "chalk": "1.x",
-    "debug": "2.x"
+    "debug": "2.x",
   },
   "devDependencies": {
     "alinex-error": "1.x",
