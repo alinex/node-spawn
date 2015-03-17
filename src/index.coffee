@@ -17,6 +17,7 @@ chalk = require 'chalk'
 EventEmitter = require('events').EventEmitter
 os = require 'os'
 path = require 'path'
+lines = require 'lines-adapter'
 # include alinex modules
 Config = require 'alinex-config'
 # internal helpers
@@ -198,35 +199,20 @@ class Spawn extends EventEmitter
           @emit 'stdout', text # send through
           for line in text.split /\n/
             debugOut chalk.grey "[#{@pid}] #{line}"
-      @proc.stderr.setEncoding "utf8"
-      @proc.stderr.on 'data', (data) =>
-        stderr += data.toString()
-        pos = stderr.lastIndexOf '\n'
-        if ~pos++
-          # copy into general buffer after line completed
-          text = stderr.substring 0, pos
-          stderr = stderr.substring pos
-          @stderr += text
-          @emit 'stderr', text # send through
-          for line in text.split /\n/
-            debugCmd chalk.grey "[#{@pid}] err: #{line}"
-      # cleanup buffers
-      bufferClean = =>
-        if stdout
-          @stdout = stdout
-          @emit 'stdout', stdout
-          debugOut chalk.grey "[#{@pid}] #{stdout}"
-        if stderr
-          @stderr = stderr
-          @emit 'stderr', stderr
-          debugErr chalk.grey "[#{@pid}] #{stderr}"
+      lines(@proc.stderr, 'utf8').on 'data', (line) ->
+        @stderr += line
+        @emit 'stderr', line # send through
+        debugErr chalk.grey "[#{@pid}] #{line}"
+      lines(@proc.stdout, 'utf8').on 'data', (line) ->
+        @stdout += line
+        @emit 'stdout', line # send through
+        debugOut chalk.grey "[#{@pid}] #{line}"
       # error management
       @proc.on 'error', (@err) =>
         if err.message is 'spawn EMFILE'
           debug chalk.grey "too much processes are opened, waiting 1s..."
           @emit 'wait', 1000
           return setTimeout (=> @_run cb), 1000
-        bufferClean()
         @error = err
         @retry cb
       # process finished
