@@ -230,7 +230,7 @@ class Spawn extends EventEmitter
       @emit 'retry', wait
       return setTimeout (=> @_run cb), wait
     # end of retries
-    @emit 'error', @error
+    @emit 'fail', @error
     debug chalk.red "[#{@pid}] #{@error.toString()}"
     cb @error, @stdout, @stderr, @code if cb
 

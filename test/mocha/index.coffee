@@ -84,3 +84,20 @@ describe "Spawn wrapper", ->
       proc.run ->
         expect(proc.code, 'code').to.equal 0
         done()
+
+    it.only "should fail for exit codes", (done) ->
+      @timeout 3000
+      proc = new Spawn
+        cmd: 'test/data/fail.sh'
+        retry: 0
+      proc.run ->
+        expect(proc.code, 'code').to.equal 128
+        done()
+
+    it "should work using retry", (done) ->
+      @timeout 3000
+      proc = new Spawn
+        cmd: 'test/data/fail.sh'
+      proc.run ->
+        expect(proc.code, 'code').to.equal 0
+        done()

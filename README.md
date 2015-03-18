@@ -356,7 +356,7 @@ __Runtime data__
 
 ### Events
 
-- `error` (object) - if an error occurred
+- `fail` (object) - if an error occurred
 - `stdout` (string) - if a line is outputted
 - `stderr` (string) - if a error line is outputted
 - `done` (integer) - if the process finished giving exit code
