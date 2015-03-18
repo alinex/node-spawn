@@ -56,3 +56,31 @@ describe "Spawn wrapper", ->
         expect(proc.code, 'exit code').to.equal 0
         done()
 
+  describe "options", ->
+
+    it "should work with multiline and logging", (done) ->
+      proc = new Spawn
+        cmd: 'top'
+        args: ['-bn', 1]
+        stdout: console.log
+      proc.run ->
+        expect(proc.code, 'code').to.equal 0
+        done()
+
+    it "should work with stream logging", (done) ->
+      @timeout 3000
+      proc = new Spawn
+        cmd: 'test/data/stream.sh'
+        stdout: console.log
+      proc.run ->
+        expect(proc.code, 'code').to.equal 0
+        done()
+
+    it "should set nice setting", (done) ->
+      @timeout 3000
+      proc = new Spawn
+        cmd: 'test/data/stream.sh'
+        priority: 0.9
+      proc.run ->
+        expect(proc.code, 'code').to.equal 0
+        done()

@@ -339,8 +339,10 @@ See the `config` property below for what to be configured here.
   - balance (boolean) - set to true to use server load balancing
   - priority (float) - between 0..1
   - retry (integer) - number of possible retries
+  - stdout - function to get stdout line by line
+  - stderr - function to get stderr line by line
 
-Runtime data
+__Runtime data__
 
 - `name` - descriptive name of the process
 - `pid` - process pid which has been given

@@ -76,7 +76,8 @@ class Spawn extends EventEmitter
   # This brings the priorities to the operating system
   @nice: (p) ->
     v = if p > 1 then 0 else 1-p
-    ~~(v*39 - 20)
+    max = process.getuid() ? 19 : 0
+    ~~(v*(max+20) - 20)
 
   # ### General check method
   # This is used if no other check method given.
@@ -193,10 +194,12 @@ class Spawn extends EventEmitter
         @stdout += "#{line}\n"
         @emit 'stdout', line # send through
         debugOut chalk.grey "[#{@pid}] #{line}"
+        @config.stdout? line
       carrier.carry @proc.stderr, (line) =>
         @stderr += "#{line}\n"
         @emit 'stderr', line # send through
         debugErr chalk.grey "[#{@pid}] #{line}"
+        @config.stderr? line
       # error management
       @proc.on 'error', (@err) =>
         if err.message is 'spawn EMFILE'
