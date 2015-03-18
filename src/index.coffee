@@ -72,6 +72,9 @@ class Spawn extends EventEmitter
       else 1
     (59 * (1 - p) + 1) * @config.load.wait / q
 
+  # ### Retry timeout
+  @retrytimeout: (p, count) -> Math.pow(count, 2) * 1000
+
   # ### Nice value
   # This brings the priorities to the operating system
   @nice: (p) ->
@@ -225,8 +228,8 @@ class Spawn extends EventEmitter
   retry: (cb) ->
     @priority = @constructor.prioritydown @priority
     if  @retrycount < @config.retry
-      wait = Math.pow(++@retrycount, 3) * 1000
-      debug "retry #{@retrycount}/#{@config.retry} in #{~~wait}s caused by #{@error}"
+      wait = @constructor.retrytimeout @priority, ++@retrycount
+      debug "retry #{@retrycount}/#{@config.retry} in #{~~(wait/1000)}s caused by #{@error}"
       @emit 'retry', wait
       return setTimeout (=> @_run cb), wait
     # end of retries

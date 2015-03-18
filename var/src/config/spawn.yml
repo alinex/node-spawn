@@ -30,5 +30,5 @@ weight:
 defaults:
   balance: false # should load balancing be on by default
   priority: 0.3   # default priority if none given
-  retry: 3 # default number of retries
+  retry: 0 # default number of retries
 
