@@ -209,9 +209,13 @@ class Spawn extends EventEmitter
         @error = err
         @retry cb
       # process finished
-      @proc.on 'close', (@code) =>
+      @proc.on 'close', (@code, signal) =>
         @end = new Date
-        debugCmd "[#{@pid}] exit: #{@code} after #{@end-@start}ms"
+        if @code
+          debugCmd "[#{@pid}] exit: code #{@code} after #{@end-@start}ms"
+        else unless @code?
+          debugCmd "[#{@pid}] exit: signal #{signal} after #{@end-@start}ms"
+          @code = -1
         @emit 'done', @code
         @error = @config.check @
         return @retry cb if @error
