@@ -82,7 +82,8 @@ class Spawn extends EventEmitter
     max = process.getuid() ? 19 : 0
     ~~(v*(max+20) - 20)
 
-  # ### General check method
+  # ### General check methods
+
   # This is used if no other check method given.
   @checkExitCode = (proc) ->
     unless proc.code? and proc.code is 0
@@ -95,6 +96,11 @@ class Spawn extends EventEmitter
         match = proc.stdout.match ERRORDETECT
         msg += ' caused by ' + match[1] if match
       # create error message
+      return new Error "#{msg} in '#{proc.name}'."
+
+  @checkNoStderr = (proc) ->
+    if proc.stderr
+      msg = proc.stderr.trim().replace /^Error:\s*/i, ''
       return new Error "#{msg} in '#{proc.name}'."
 
   # Instance methods
