@@ -98,8 +98,8 @@ describe "Spawn wrapper", ->
       @timeout 30000
       proc = new Spawn
         cmd: 'test/data/fail.sh'
-        retry: 3
+        retry: 2
       proc.run ->
         expect(proc.code, 'code').to.equal 128
-        expect(proc.retrycount, 'code').to.equal 3
+        expect(proc.retrycount, 'code').to.equal 2
         done()
