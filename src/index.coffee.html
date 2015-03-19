@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>index.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="../doc-style.css" />
+  <script src="../doc-filelist.js"></script>
+  <script>
+    var relativeDir = "../", thisFile = "home/alex/a3/node-spawn/src/indexcoffee", defaultSidebar = true;
+  </script>
+  <script src="../doc-script.js"></script>
+  <script src="../fileSearch.js"></script>
+  <script src="../goToLine.js"></script>
+  <link rel="stylesheet" href="../fileSearch.css" />
+  <link rel="stylesheet" href="../goToLine.css" />
+</head>
+<body>
+  <div id="sidebar_wrapper">
+    <div id="sidebar_switch">
+      <span class="tree">Files</span>
+      <span class="headings">Headings</span>
+    </div>
+    <div id="tree"></div>
+    <div id="headings">
+      <div class="heading h1">
+        <a href="#spawn%20wrapper%20class">Spawn wrapper class</a>
+      </div>
+      <div class="heading h2">
+        <a href="#node%20modules">Node Modules</a>
+      </div>
+      <div class="heading h2">
+        <a href="#class%20definition">Class definition</a>
+      </div>
+      <div class="heading h3">
+        <a href="#get%20load%20limit">Get load limit</a>
+      </div>
+      <div class="heading h3">
+        <a href="#priority%20up">Priority Up</a>
+      </div>
+      <div class="heading h3">
+        <a href="#priority%20down">Priority Down</a>
+      </div>
+      <div class="heading h3">
+        <a href="#timeout">Timeout</a>
+      </div>
+      <div class="heading h3">
+        <a href="#retry%20timeout">Retry timeout</a>
+      </div>
+      <div class="heading h3">
+        <a href="#nice%20value">Nice value</a>
+      </div>
+      <div class="heading h3">
+        <a href="#general%20check%20methods">General check methods</a>
+      </div>
+      <div class="heading h2">
+        <a href="#instance%20methods">Instance methods</a>
+      </div>
+      <div class="heading h3">
+        <a href="#create%20instance">Create instance</a>
+      </div>
+      <div class="heading h3">
+        <a href="#check%20if%20it%20can%20start">Check if it can start</a>
+      </div>
+      <div class="heading h3">
+        <a href="#start%20the%20process">Start the process</a>
+      </div>
+      <div class="heading h3">
+        <a href="#retry%20process%20call%20after%20error">Retry process call after error</a>
+      </div>
+    </div>
+  </div>
+  <div id="sidebar-toggle"></div>
+  <div id="container" tabindex="0"><a id="fork" href="https://github.com/alinex/node-spawn" title="Fork me on GitHub"></a><div class="background highlight"></div>
+<table cellpadding="0" cellspacing="0">
+  <tbody>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="spawn%20wrapper%20class">
+  <h1>
+    <a href="#spawn%20wrapper%20class" name="spawn%20wrapper%20class" class="pilcrow">&#182;</a>
+    Spawn wrapper class
+  </h1>
+</div>
+
+
+<p>This is an object oriented implementation arround the core <code>process.spawn</code>
+command.</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre></pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="node%20modules">
+  <h2>
+    <a href="#node%20modules" name="node%20modules" class="pilcrow">&#182;</a>
+    Node Modules
+  </h2>
+</div>
+
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-3" id="section-3">&#182;</a>
+</div>
+<p>include base modules</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+<span class="nv">debug = </span><span class="nx">require</span><span class="p">(</span><span class="s">&#39;debug&#39;</span><span class="p">)(</span><span class="s">&#39;spawn&#39;</span><span class="p">)</span>
+<span class="nv">debugCmd = </span><span class="nx">require</span><span class="p">(</span><span class="s">&#39;debug&#39;</span><span class="p">)(</span><span class="s">&#39;spawn:cmd&#39;</span><span class="p">)</span>
+<span class="nv">debugOut = </span><span class="nx">require</span><span class="p">(</span><span class="s">&#39;debug&#39;</span><span class="p">)(</span><span class="s">&#39;spawn:out&#39;</span><span class="p">)</span>
+<span class="nv">debugErr = </span><span class="nx">require</span><span class="p">(</span><span class="s">&#39;debug&#39;</span><span class="p">)(</span><span class="s">&#39;spawn:err&#39;</span><span class="p">)</span>
+<span class="nv">debugBalance = </span><span class="nx">require</span><span class="p">(</span><span class="s">&#39;debug&#39;</span><span class="p">)(</span><span class="s">&#39;spawn:balance&#39;</span><span class="p">)</span>
+<span class="nv">chalk = </span><span class="nx">require</span> <span class="s">&#39;chalk&#39;</span>
+<span class="p">{</span><span class="nx">spawn</span><span class="p">}</span> <span class="o">=</span> <span class="nx">require</span> <span class="s">&#39;child_process&#39;</span>
+<span class="nv">EventEmitter = </span><span class="nx">require</span><span class="p">(</span><span class="s">&#39;events&#39;</span><span class="p">).</span><span class="nx">EventEmitter</span>
+<span class="nv">os = </span><span class="nx">require</span> <span class="s">&#39;os&#39;</span>
+<span class="nv">path = </span><span class="nx">require</span> <span class="s">&#39;path&#39;</span>
+<span class="nv">carrier = </span><span class="nx">require</span> <span class="s">&#39;carrier&#39;</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-4" id="section-4">&#182;</a>
+</div>
+<p>include alinex modules</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+<span class="nv">Config = </span><span class="nx">require</span> <span class="s">&#39;alinex-config&#39;</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-5" id="section-5">&#182;</a>
+</div>
+<p>internal helpers</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+<span class="nv">configcheck = </span><span class="nx">require</span> <span class="s">&#39;./configcheck&#39;</span>
+
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-6" id="section-6">&#182;</a>
+</div>
+<p>the expression to find detailed error messages in unknown processes</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+<span class="nv">ERRORDETECT = </span><span class="sr">/Error:\s((\w| )+)/i</span>
+
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="class%20definition">
+  <h2>
+    <a href="#class%20definition" name="class%20definition" class="pilcrow">&#182;</a>
+    Class definition
+  </h2>
+</div>
+
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+<span class="k">class</span> <span class="nx">Spawn</span> <span class="k">extends</span> <span class="nx">EventEmitter</span>
+
+  <span class="vi">@init: </span><span class="nf">(config = &#39;spawn&#39;, cb) -&gt;</span>
+    <span class="k">return</span> <span class="nx">cb</span><span class="o">?</span><span class="p">()</span> <span class="k">if</span> <span class="nx">@config</span> <span class="c1"># already loaded</span>
+    <span class="nx">@_configSource</span> <span class="o">?=</span> <span class="nx">config</span> <span class="c1"># store what to load</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-8" id="section-8">&#182;</a>
+</div>
+<p>start resolving configuration</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+    <span class="nx">Config</span><span class="p">.</span><span class="nx">get</span> <span class="nx">@_configSource</span><span class="p">,</span> <span class="p">[</span>
+      <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">path</span><span class="p">.</span><span class="nx">dirname</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">),</span> <span class="s">&#39;var/src/config&#39;</span>
+      <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">path</span><span class="p">.</span><span class="nx">dirname</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">),</span> <span class="s">&#39;var/local/config&#39;</span>
+    <span class="p">],</span> <span class="nx">configcheck</span><span class="p">,</span> <span class="nf">(err, @config) =&gt;</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-9" id="section-9">&#182;</a>
+</div>
+<p>results stored, now check for errors</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">error</span> <span class="nx">err</span> <span class="k">if</span> <span class="nx">err</span>
+      <span class="nx">cb</span> <span class="nx">err</span> <span class="k">if</span> <span class="nx">cb</span><span class="o">?</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-10" id="section-10">&#182;</a>
+</div>
+<p>overall runtime information</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+  <span class="vi">@weight: </span><span class="mi">0</span>
+  <span class="vi">@time: </span><span class="kc">null</span>
+  <span class="vi">@queue: </span><span class="mi">0</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="get%20load%20limit">
+  <h3>
+    <a href="#get%20load%20limit" name="get%20load%20limit" class="pilcrow">&#182;</a>
+    Get load limit
+  </h3>
+</div>
+
+
+<p>returns the load limit (between 0.8 and 4.0 with LOAD=1) the curve
+is strong exponential, meaning higher priorities are higher load values allowed</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+  <span class="vi">@load: </span><span class="nf">(p) -&gt;</span> <span class="p">(</span><span class="mf">3.2</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">((</span><span class="nb">Math</span><span class="p">.</span><span class="nx">exp</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">E</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.8</span><span class="p">)</span> <span class="o">*</span> <span class="nx">@config</span><span class="p">.</span><span class="nx">load</span><span class="p">.</span><span class="nx">limit</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="priority%20up">
+  <h3>
+    <a href="#priority%20up" name="priority%20up" class="pilcrow">&#182;</a>
+    Priority Up
+  </h3>
+</div>
+
+
+<p>This method calculates the new priority before a timeout.</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+  <span class="vi">@priorityup: </span><span class="nf">(p) -&gt;</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span> <span class="mi">1</span><span class="o">-</span><span class="nx">p</span><span class="p">,</span> <span class="mf">1.1</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="priority%20down">
+  <h3>
+    <a href="#priority%20down" name="priority%20down" class="pilcrow">&#182;</a>
+    Priority Down
+  </h3>
+</div>
+
+
+<p>This method calculates the new priority before a retry.</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+  <span class="vi">@prioritydown: </span><span class="nf">(p) -&gt;</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span> <span class="nx">p</span><span class="p">,</span> <span class="mf">0.8</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="timeout">
+  <h3>
+    <a href="#timeout" name="timeout" class="pilcrow">&#182;</a>
+    Timeout
+  </h3>
+</div>
+
+
+<p>This gives the number of milliseconds to wait</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+  <span class="vi">@loadtimeout: </span><span class="nf">(p, diff) -&gt;</span>
+    <span class="nv">q = </span><span class="k">switch</span>
+      <span class="k">when</span> <span class="nx">diff</span> <span class="o">&lt;</span> <span class="mf">1.05</span> <span class="k">then</span> <span class="mi">10</span>
+      <span class="k">when</span> <span class="nx">diff</span> <span class="o">&lt;</span> <span class="mf">1.1</span> <span class="k">then</span> <span class="mi">5</span>
+      <span class="k">when</span> <span class="nx">diff</span> <span class="o">&lt;</span> <span class="mf">1.2</span> <span class="k">then</span> <span class="mi">2</span>
+      <span class="k">else</span> <span class="mi">1</span>
+    <span class="p">(</span><span class="mi">59</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nx">p</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nx">@config</span><span class="p">.</span><span class="nx">load</span><span class="p">.</span><span class="nx">wait</span> <span class="o">/</span> <span class="nx">q</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="retry%20timeout">
+  <h3>
+    <a href="#retry%20timeout" name="retry%20timeout" class="pilcrow">&#182;</a>
+    Retry timeout
+  </h3>
+</div>
+
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+  <span class="vi">@retrytimeout: </span><span class="nf">(p, count) -&gt;</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="nx">count</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="nice%20value">
+  <h3>
+    <a href="#nice%20value" name="nice%20value" class="pilcrow">&#182;</a>
+    Nice value
+  </h3>
+</div>
+
+
+<p>This brings the priorities to the operating system</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+  <span class="vi">@nice: </span><span class="nf">(p) -&gt;</span>
+    <span class="nv">v = </span><span class="k">if</span> <span class="nx">p</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">then</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span><span class="o">-</span><span class="nx">p</span>
+    <span class="nv">max = </span><span class="nx">process</span><span class="p">.</span><span class="nx">getuid</span><span class="p">()</span> <span class="o">?</span> <span class="mi">19</span> <span class="o">:</span> <span class="mi">0</span>
+    <span class="o">~~</span><span class="p">(</span><span class="nx">v</span><span class="o">*</span><span class="p">(</span><span class="nx">max</span><span class="o">+</span><span class="mi">20</span><span class="p">)</span> <span class="o">-</span> <span class="mi">20</span><span class="p">)</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="general%20check%20methods">
+  <h3>
+    <a href="#general%20check%20methods" name="general%20check%20methods" class="pilcrow">&#182;</a>
+    General check methods
+  </h3>
+</div>
+
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-18" id="section-18">&#182;</a>
+</div>
+<p>This is used if no other check method given.</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+  <span class="vi">@checkExitCode = </span><span class="nf">(proc) -&gt;</span>
+    <span class="k">unless</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">code</span><span class="o">?</span> <span class="o">and</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">code</span> <span class="o">is</span> <span class="mi">0</span>
+      <span class="nv">msg = </span><span class="s">&quot;Got exit code of </span><span class="si">#{</span><span class="nx">proc</span><span class="p">.</span><span class="nx">code</span><span class="si">}</span><span class="s">&quot;</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-19" id="section-19">&#182;</a>
+</div>
+<p>try to get detailed error message</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+      <span class="k">if</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">stderr</span><span class="p">.</span><span class="nx">length</span>
+        <span class="nv">match = </span><span class="nx">proc</span><span class="p">.</span><span class="nx">stderr</span><span class="p">.</span><span class="nx">match</span> <span class="nx">ERRORDETECT</span>
+        <span class="nx">msg</span> <span class="o">+=</span> <span class="s">&#39; caused by &#39;</span> <span class="o">+</span> <span class="nx">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nx">match</span>
+      <span class="k">else</span>
+        <span class="nv">match = </span><span class="nx">proc</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">match</span> <span class="nx">ERRORDETECT</span>
+        <span class="nx">msg</span> <span class="o">+=</span> <span class="s">&#39; caused by &#39;</span> <span class="o">+</span> <span class="nx">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nx">match</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-20" id="section-20">&#182;</a>
+</div>
+<p>create error message</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+      <span class="k">return</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">msg</span><span class="si">}</span><span class="s"> in &#39;</span><span class="si">#{</span><span class="nx">proc</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="s">&#39;.&quot;</span>
+
+  <span class="vi">@checkNoStderr = </span><span class="nf">(proc) -&gt;</span>
+    <span class="k">if</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">stderr</span>
+      <span class="nv">msg = </span><span class="nx">proc</span><span class="p">.</span><span class="nx">stderr</span><span class="p">.</span><span class="nx">trim</span><span class="p">().</span><span class="nx">replace</span> <span class="sr">/^Error:\s*/i</span><span class="p">,</span> <span class="s">&#39;&#39;</span>
+      <span class="k">return</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">msg</span><span class="si">}</span><span class="s"> in &#39;</span><span class="si">#{</span><span class="nx">proc</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="s">&#39;.&quot;</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="instance%20methods">
+  <h2>
+    <a href="#instance%20methods" name="instance%20methods" class="pilcrow">&#182;</a>
+    Instance methods
+  </h2>
+</div>
+
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="create%20instance">
+  <h3>
+    <a href="#create%20instance" name="create%20instance" class="pilcrow">&#182;</a>
+    Create instance
+  </h3>
+</div>
+
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+  <span class="nv">constructor: </span><span class="nf">(@config) -&gt;</span>
+    <span class="vi">@config.check = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">checkExitCode</span> <span class="k">unless</span> <span class="nx">@config</span><span class="p">.</span><span class="nx">check</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&quot;No command given for spawn&quot;</span> <span class="k">unless</span> <span class="nx">@config</span><span class="p">.</span><span class="nx">cmd</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="check%20if%20it%20can%20start">
+  <h3>
+    <a href="#check%20if%20it%20can%20start" name="check%20if%20it%20can%20start" class="pilcrow">&#182;</a>
+    Check if it can start
+  </h3>
+</div>
+
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+  <span class="nv">loadcheck: </span><span class="nf">(cb) =&gt;</span>
+    <span class="k">return</span> <span class="nx">cb</span><span class="p">()</span> <span class="k">unless</span> <span class="nx">@config</span><span class="p">.</span><span class="nx">balance</span> <span class="c1"># run immediately</span>
+    <span class="nx">@constructor</span><span class="p">.</span><span class="nx">queue</span><span class="o">--</span>
+    <span class="nv">load = </span><span class="nx">os</span><span class="p">.</span><span class="nx">loadavg</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="nx">os</span><span class="p">.</span><span class="nx">cpus</span><span class="p">().</span><span class="nx">length</span>
+    <span class="nv">limit = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">load</span> <span class="nx">@priority</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-24" id="section-24">&#182;</a>
+</div>
+<p>load is ok, but check current added weight</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+    <span class="k">if</span> <span class="nx">load</span> <span class="o">&lt;</span> <span class="nx">limit</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-25" id="section-25">&#182;</a>
+</div>
+<p>reset weight if new time (unit=10s)</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+      <span class="nv">ntime = </span><span class="o">~~</span><span class="p">(</span><span class="o">+</span><span class="k">new</span> <span class="nb">Date</span> <span class="o">/</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">start</span><span class="p">.</span><span class="nx">interval</span><span class="p">)</span>
+      <span class="k">if</span> <span class="nx">ntime</span> <span class="o">isnt</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">time</span>
+        <span class="vi">@constructor.time = </span><span class="nx">ntime</span>
+        <span class="vi">@constructor.weight = </span><span class="mi">0</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-26" id="section-26">&#182;</a>
+</div>
+<p>calculate new weight</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+      <span class="nv">name = </span><span class="nx">path</span><span class="p">.</span><span class="nx">basename</span><span class="p">(</span><span class="nx">@config</span><span class="p">.</span><span class="nx">cmd</span><span class="p">)</span>
+      <span class="nv">nweight = </span><span class="k">if</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">weight</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span><span class="o">?</span>
+        <span class="nx">@constructor</span><span class="p">.</span><span class="nx">weight</span> <span class="o">+</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">weight</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span>
+      <span class="k">else</span>
+        <span class="nx">@constructor</span><span class="p">.</span><span class="nx">weight</span> <span class="o">+</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">weight</span><span class="p">.</span><span class="nx">DEFAULT</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-27" id="section-27">&#182;</a>
+</div>
+<p>check new weight > limit (timeout 1000)</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+      <span class="k">if</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">weight</span> <span class="o">isnt</span> <span class="mi">0</span> <span class="o">and</span> <span class="nx">nweight</span> <span class="o">&gt;</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">start</span><span class="p">.</span><span class="nx">limit</span>
+        <span class="nx">debugBalance</span> <span class="nx">chalk</span><span class="p">.</span><span class="nx">grey</span> <span class="s">&quot;current weight </span><span class="si">#{</span><span class="nx">nweight</span><span class="si">}</span><span class="s"> &gt; </span><span class="si">#{</span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">start</span><span class="p">.</span><span class="nx">limit</span><span class="si">}</span><span class="s">,</span>
+<span class="s">        waiting </span><span class="si">#{</span><span class="o">~~</span><span class="p">(</span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">start</span><span class="p">.</span><span class="nx">interval</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span><span class="si">}</span><span class="s">s...&quot;</span>
+        <span class="nx">@constructor</span><span class="p">.</span><span class="nx">queue</span><span class="o">++</span>
+        <span class="nx">@emit</span> <span class="s">&#39;wait&#39;</span><span class="p">,</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">start</span><span class="p">.</span><span class="nx">interval</span>
+        <span class="k">return</span> <span class="nx">setTimeout</span> <span class="p">(</span><span class="o">=&gt;</span> <span class="nx">@loadcheck</span> <span class="nx">cb</span><span class="p">),</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">start</span><span class="p">.</span><span class="nx">interval</span>
+      <span class="vi">@constructor.weight = </span><span class="nx">nweight</span>
+      <span class="k">return</span> <span class="nx">cb</span><span class="p">()</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-28" id="section-28">&#182;</a>
+</div>
+<p>rerun check after timeout</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+    <span class="vi">@priority = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">priorityup</span> <span class="nx">@priority</span>
+    <span class="nv">wait = </span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">loadtimeout</span> <span class="nx">@priority</span><span class="p">,</span> <span class="nx">load</span><span class="o">/</span><span class="nx">limit</span>
+    <span class="nx">wait</span> <span class="o">+=</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">queue</span><span class="o">*</span><span class="mi">10</span> <span class="c1"># add 10ms waiting time for each job in queue</span>
+    <span class="nx">debugBalance</span> <span class="nx">chalk</span><span class="p">.</span><span class="nx">grey</span> <span class="s">&quot;load </span><span class="si">#{</span><span class="nx">load</span><span class="p">.</span><span class="nx">toFixed</span> <span class="mi">2</span><span class="si">}</span><span class="s"> &gt; </span><span class="si">#{</span><span class="nx">limit</span><span class="p">.</span><span class="nx">toFixed</span> <span class="mi">2</span><span class="si">}</span><span class="s"> (p=</span><span class="si">#{</span><span class="nx">@priority</span><span class="p">.</span><span class="nx">toFixed</span> <span class="mi">2</span><span class="si">}</span><span class="s">),</span>
+<span class="s">    waiting </span><span class="si">#{</span><span class="o">~~</span><span class="p">(</span><span class="nx">wait</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span><span class="si">}</span><span class="s">s&quot;</span>
+    <span class="nx">@constructor</span><span class="p">.</span><span class="nx">queue</span><span class="o">++</span>
+    <span class="nx">@emit</span> <span class="s">&#39;wait&#39;</span><span class="p">,</span> <span class="nx">wait</span>
+    <span class="nx">setTimeout</span> <span class="p">(</span><span class="o">=&gt;</span> <span class="nx">@loadcheck</span> <span class="nx">cb</span><span class="p">),</span> <span class="nx">wait</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="start%20the%20process">
+  <h3>
+    <a href="#start%20the%20process" name="start%20the%20process" class="pilcrow">&#182;</a>
+    Start the process
+  </h3>
+</div>
+
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+  <span class="nv">run: </span><span class="nf">(cb) -&gt;</span>
+    <span class="nx">@constructor</span><span class="p">.</span><span class="nx">init</span> <span class="kc">null</span><span class="p">,</span> <span class="nf">(err) =&gt;</span>
+      <span class="k">return</span> <span class="nx">cb</span> <span class="nx">err</span> <span class="k">if</span> <span class="nx">err</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-30" id="section-30">&#182;</a>
+</div>
+<p>update config</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+      <span class="nx">@config</span><span class="p">.</span><span class="nx">balance</span> <span class="o">?=</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">balance</span>
+      <span class="nx">@config</span><span class="p">.</span><span class="nx">priority</span> <span class="o">?=</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">priority</span>
+      <span class="nx">@config</span><span class="p">.</span><span class="nx">retry</span> <span class="o">?=</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">retry</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-31" id="section-31">&#182;</a>
+</div>
+<p>init internal variables</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+      <span class="vi">@retrycount = </span><span class="mi">0</span>
+      <span class="vi">@priority = </span><span class="nx">@config</span><span class="p">.</span><span class="nx">priority</span>
+      <span class="vi">@name = </span><span class="nx">@config</span><span class="p">.</span><span class="nx">name</span> <span class="o">?</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">path</span><span class="p">.</span><span class="nx">basename</span> <span class="nx">@config</span><span class="p">.</span><span class="nx">cmd</span><span class="si">}</span><span class="s"> </span><span class="si">#{</span><span class="p">(</span><span class="nx">@config</span><span class="p">.</span><span class="nx">args</span> <span class="o">?</span> <span class="p">[]).</span><span class="nx">join</span> <span class="s">&#39; &#39;</span><span class="si">}</span><span class="s">&quot;</span>
+      <span class="nx">@_run</span> <span class="nx">cb</span>
+
+  <span class="nv">_run: </span><span class="nf">(cb) -&gt;</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-32" id="section-32">&#182;</a>
+</div>
+<p>check configuration</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+    <span class="k">unless</span> <span class="nx">@config</span><span class="p">.</span><span class="nx">cmd</span>
+      <span class="nv">err = </span><span class="k">new</span> <span class="nb">Error</span> <span class="s">&quot;No command specified for spawn.&quot;</span>
+      <span class="nx">@emit</span> <span class="s">&#39;error&#39;</span><span class="p">,</span> <span class="nx">err</span>
+      <span class="nx">cb</span> <span class="nx">err</span> <span class="k">if</span> <span class="nx">cb</span>
+      <span class="k">return</span>
+    <span class="nx">@constructor</span><span class="p">.</span><span class="nx">queue</span><span class="o">++</span>
+    <span class="nx">@loadcheck</span> <span class="o">=&gt;</span>
+      <span class="nx">debug</span> <span class="s">&quot;start job </span><span class="si">#{</span><span class="nx">@name</span><span class="si">}</span><span class="s">&quot;</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-33" id="section-33">&#182;</a>
+</div>
+<p>cleanup result</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+      <span class="vi">@stdout = @stderr = </span><span class="s">&#39;&#39;</span>
+      <span class="vi">@end = @code = @error = </span><span class="kc">null</span>
+      <span class="vi">@start = </span><span class="k">new</span> <span class="nb">Date</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-34" id="section-34">&#182;</a>
+</div>
+<p>create new subprocess</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+      <span class="nv">cmd = </span><span class="nx">@config</span><span class="p">.</span><span class="nx">cmd</span>
+      <span class="nv">args = </span><span class="p">[]</span>
+      <span class="nv">args = </span><span class="nx">@config</span><span class="p">.</span><span class="nx">args</span><span class="p">.</span><span class="nx">slice</span> <span class="mi">0</span> <span class="k">if</span> <span class="nx">@config</span><span class="p">.</span><span class="nx">args</span><span class="o">?</span>
+      <span class="k">if</span> <span class="nx">process</span><span class="p">.</span><span class="nx">platform</span> <span class="o">is</span> <span class="s">&#39;linux&#39;</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-35" id="section-35">&#182;</a>
+</div>
+<p>add support for nice call</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+        <span class="nv">nice = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">nice</span> <span class="nx">@priority</span>
+        <span class="nx">args</span><span class="p">.</span><span class="nx">unshift</span> <span class="nx">@config</span><span class="p">.</span><span class="nx">cmd</span> <span class="c1"># command</span>
+        <span class="nx">args</span><span class="p">.</span><span class="nx">unshift</span> <span class="nx">@constructor</span><span class="p">.</span><span class="nx">nice</span> <span class="nx">@priority</span> <span class="c1"># nice setting</span>
+        <span class="nx">args</span><span class="p">.</span><span class="nx">unshift</span> <span class="s">&#39;-n&#39;</span>
+        <span class="nv">cmd = </span><span class="s">&#39;nice&#39;</span>
+      <span class="vi">@proc = </span><span class="nx">spawn</span> <span class="nx">cmd</span><span class="p">,</span> <span class="nx">args</span><span class="p">,</span>
+        <span class="nv">cwd: </span><span class="nx">@config</span><span class="p">.</span><span class="nx">cwd</span>
+        <span class="nv">env: </span><span class="nx">@config</span><span class="p">.</span><span class="nx">env</span>
+        <span class="nv">uid: </span><span class="nx">@config</span><span class="p">.</span><span class="nx">uid</span>
+        <span class="nv">gid: </span><span class="nx">@config</span><span class="p">.</span><span class="nx">gid</span>
+        <span class="nv">input: </span><span class="nx">@config</span><span class="p">.</span><span class="nx">input</span>
+        <span class="nv">stdio: </span><span class="nx">@config</span><span class="p">.</span><span class="nx">stdio</span>
+      <span class="vi">@pid = </span><span class="nx">@proc</span><span class="p">.</span><span class="nx">pid</span>
+      <span class="nx">debugCmd</span> <span class="s">&quot;[</span><span class="si">#{</span><span class="nx">@pid</span><span class="si">}</span><span class="s">] </span><span class="si">#{</span><span class="nx">@config</span><span class="p">.</span><span class="nx">cmd</span><span class="si">}</span><span class="s"> </span><span class="si">#{</span><span class="p">(</span><span class="nx">@config</span><span class="p">.</span><span class="nx">args</span> <span class="o">?</span> <span class="p">[]).</span><span class="nx">join</span> <span class="s">&#39; &#39;</span><span class="si">}</span><span class="s">&quot;</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-36" id="section-36">&#182;</a>
+</div>
+<p>collect output</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+      <span class="nv">stdout = stderr = </span><span class="s">&#39;&#39;</span>
+      <span class="nx">carrier</span><span class="p">.</span><span class="nx">carry</span> <span class="nx">@proc</span><span class="p">.</span><span class="nx">stdout</span><span class="p">,</span> <span class="nf">(line) =&gt;</span>
+        <span class="nx">@stdout</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">line</span><span class="si">}</span><span class="s">\n&quot;</span>
+        <span class="nx">@emit</span> <span class="s">&#39;stdout&#39;</span><span class="p">,</span> <span class="nx">line</span> <span class="c1"># send through</span>
+        <span class="nx">debugOut</span> <span class="nx">chalk</span><span class="p">.</span><span class="nx">grey</span> <span class="s">&quot;[</span><span class="si">#{</span><span class="nx">@pid</span><span class="si">}</span><span class="s">] </span><span class="si">#{</span><span class="nx">line</span><span class="si">}</span><span class="s">&quot;</span>
+        <span class="nx">@config</span><span class="p">.</span><span class="nx">stdout</span><span class="o">?</span> <span class="nx">line</span>
+      <span class="nx">carrier</span><span class="p">.</span><span class="nx">carry</span> <span class="nx">@proc</span><span class="p">.</span><span class="nx">stderr</span><span class="p">,</span> <span class="nf">(line) =&gt;</span>
+        <span class="nx">@stderr</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">line</span><span class="si">}</span><span class="s">\n&quot;</span>
+        <span class="nx">@emit</span> <span class="s">&#39;stderr&#39;</span><span class="p">,</span> <span class="nx">line</span> <span class="c1"># send through</span>
+        <span class="nx">debugErr</span> <span class="nx">chalk</span><span class="p">.</span><span class="nx">grey</span> <span class="s">&quot;[</span><span class="si">#{</span><span class="nx">@pid</span><span class="si">}</span><span class="s">] </span><span class="si">#{</span><span class="nx">line</span><span class="si">}</span><span class="s">&quot;</span>
+        <span class="nx">@config</span><span class="p">.</span><span class="nx">stderr</span><span class="o">?</span> <span class="nx">line</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-37" id="section-37">&#182;</a>
+</div>
+<p>error management</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+      <span class="nx">@proc</span><span class="p">.</span><span class="nx">on</span> <span class="s">&#39;error&#39;</span><span class="p">,</span> <span class="nf">(@err) =&gt;</span>
+        <span class="k">if</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span> <span class="o">is</span> <span class="s">&#39;spawn EMFILE&#39;</span>
+          <span class="nx">debug</span> <span class="nx">chalk</span><span class="p">.</span><span class="nx">grey</span> <span class="s">&quot;too much processes are opened, waiting 1s...&quot;</span>
+          <span class="nx">@emit</span> <span class="s">&#39;wait&#39;</span><span class="p">,</span> <span class="mi">1000</span>
+          <span class="k">return</span> <span class="nx">setTimeout</span> <span class="p">(</span><span class="o">=&gt;</span> <span class="nx">@_run</span> <span class="nx">cb</span><span class="p">),</span> <span class="mi">1000</span>
+        <span class="vi">@error = </span><span class="nx">err</span>
+        <span class="nx">@retry</span> <span class="nx">cb</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-38" id="section-38">&#182;</a>
+</div>
+<p>process finished</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+      <span class="nx">@proc</span><span class="p">.</span><span class="nx">on</span> <span class="s">&#39;close&#39;</span><span class="p">,</span> <span class="nf">(@code, signal) =&gt;</span>
+        <span class="vi">@end = </span><span class="k">new</span> <span class="nb">Date</span>
+        <span class="k">if</span> <span class="nx">@code</span>
+          <span class="nx">debugCmd</span> <span class="s">&quot;[</span><span class="si">#{</span><span class="nx">@pid</span><span class="si">}</span><span class="s">] exit: code </span><span class="si">#{</span><span class="nx">@code</span><span class="si">}</span><span class="s"> after </span><span class="si">#{</span><span class="nx">@end</span><span class="o">-</span><span class="nx">@start</span><span class="si">}</span><span class="s">ms&quot;</span>
+        <span class="k">else</span> <span class="k">unless</span> <span class="nx">@code</span><span class="o">?</span>
+          <span class="nx">debugCmd</span> <span class="s">&quot;[</span><span class="si">#{</span><span class="nx">@pid</span><span class="si">}</span><span class="s">] exit: signal </span><span class="si">#{</span><span class="nx">signal</span><span class="si">}</span><span class="s"> after </span><span class="si">#{</span><span class="nx">@end</span><span class="o">-</span><span class="nx">@start</span><span class="si">}</span><span class="s">ms&quot;</span>
+          <span class="vi">@code = </span><span class="o">-</span><span class="mi">1</span>
+        <span class="nx">@emit</span> <span class="s">&#39;done&#39;</span><span class="p">,</span> <span class="nx">@code</span>
+        <span class="vi">@error = </span><span class="nx">@config</span><span class="p">.</span><span class="nx">check</span> <span class="nx">@</span>
+        <span class="k">return</span> <span class="nx">@retry</span> <span class="nx">cb</span> <span class="k">if</span> <span class="nx">@error</span>
+        <span class="nx">cb</span> <span class="nx">@error</span><span class="p">,</span> <span class="nx">@stdout</span><span class="p">.</span><span class="nx">trim</span><span class="p">(),</span> <span class="nx">@stderr</span><span class="p">.</span><span class="nx">trim</span><span class="p">(),</span> <span class="nx">@code</span> <span class="k">if</span> <span class="nx">cb</span>
+
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap" id="retry%20process%20call%20after%20error">
+  <h3>
+    <a href="#retry%20process%20call%20after%20error" name="retry%20process%20call%20after%20error" class="pilcrow">&#182;</a>
+    Retry process call after error
+  </h3>
+</div>
+
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+  <span class="nv">retry: </span><span class="nf">(cb) -&gt;</span>
+    <span class="vi">@priority = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">prioritydown</span> <span class="nx">@priority</span>
+    <span class="k">if</span>  <span class="nx">@retrycount</span> <span class="o">&lt;</span> <span class="nx">@config</span><span class="p">.</span><span class="nx">retry</span>
+      <span class="nv">wait = </span><span class="nx">@constructor</span><span class="p">.</span><span class="nx">retrytimeout</span> <span class="nx">@priority</span><span class="p">,</span> <span class="o">++</span><span class="nx">@retrycount</span>
+      <span class="nx">debug</span> <span class="s">&quot;retry </span><span class="si">#{</span><span class="nx">@retrycount</span><span class="si">}</span><span class="s">/</span><span class="si">#{</span><span class="nx">@config</span><span class="p">.</span><span class="nx">retry</span><span class="si">}</span><span class="s"> in </span><span class="si">#{</span><span class="o">~~</span><span class="p">(</span><span class="nx">wait</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span><span class="si">}</span><span class="s">s caused by </span><span class="si">#{</span><span class="nx">@error</span><span class="si">}</span><span class="s">&quot;</span>
+      <span class="nx">@emit</span> <span class="s">&#39;retry&#39;</span><span class="p">,</span> <span class="nx">wait</span>
+      <span class="k">return</span> <span class="nx">setTimeout</span> <span class="p">(</span><span class="o">=&gt;</span> <span class="nx">@_run</span> <span class="nx">cb</span><span class="p">),</span> <span class="nx">wait</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-40" id="section-40">&#182;</a>
+</div>
+<p>end of retries</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+    <span class="nx">@emit</span> <span class="s">&#39;fail&#39;</span><span class="p">,</span> <span class="nx">@error</span>
+    <span class="nx">debug</span> <span class="nx">chalk</span><span class="p">.</span><span class="nx">red</span> <span class="s">&quot;[</span><span class="si">#{</span><span class="nx">@pid</span><span class="si">}</span><span class="s">] </span><span class="si">#{</span><span class="nx">@error</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span><span class="si">}</span><span class="s">&quot;</span>
+    <span class="nx">cb</span> <span class="nx">@error</span><span class="p">,</span> <span class="nx">@stdout</span><span class="p">,</span> <span class="nx">@stderr</span><span class="p">,</span> <span class="nx">@code</span> <span class="k">if</span> <span class="nx">cb</span>
+
+
+<span class="nv">module.exports = </span><span class="nx">Spawn</span>
+</pre></div>
+        </td>
+      </tr>
+  </tbody>
+</table>
+  </div>
+</body>
+</html>

@@ -1,0 +1,1 @@
+var tree={"files":[".travis.yml","Changelog.md","README.md"],"dirs":{"src":{"files":["configcheck.coffee","index.coffee"]},"var":{"dirs":{"src":{"dirs":{"config":{"files":["spawn.yml"]}}}}}}};
