@@ -4,6 +4,24 @@ Version changes
 The following list gives a short overview about what is changed between
 individual versions:
 
+Version 1.0.0 (2015-03-19)
+-------------------------------------------------
+- Make tests faster by checking only two retries.
+- Document retry timeout handling.
+- Added default check for no stderr output.
+- Fixed retry handling to correct count.
+- Allow errors to be returned and handled without try.
+- Try to handle process close on signals.
+- Added logging, tests and use nice settings within valid range.
+- Enable debug output to be line oriented.
+- Added lines-adapter to better stream output line oriented.
+- Restructure to use newer config access and support balance-config.
+- Update documentation syntax.
+- Small fixes.
+- Upgraded dependent packages.
+- Fixed gid setting and added input specification.
+- Try to fix unknown error thwown bug.
+
 Version 0.1.6 (2015-02-03)
 -------------------------------------------------
 - Added local configs to search path if used as module, also.
