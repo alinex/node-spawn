@@ -6,7 +6,7 @@
   <link rel="stylesheet" media="all" href="../doc-style.css" />
   <script src="../doc-filelist.js"></script>
   <script>
-    var relativeDir = "../", thisFile = "home/alex/a3/node-spawn/src/index.coffee", defaultSidebar = true;
+    var relativeDir = "../", thisFile = "home/alex/a3/node-spawn/src/indexcoffee", defaultSidebar = true;
   </script>
   <script src="../doc-script.js"></script>
   <script src="../fileSearch.js"></script>
@@ -70,7 +70,7 @@
     </div>
   </div>
   <div id="sidebar-toggle"></div>
-  <div id="container" tabindex="0"><a id="fork" href="https://github.com/alinex/node-spawn" title="Fork me on GitHub"></a><div class="background highlight"></div>
+  <div id="container" tabindex="0"><a id="fork" href="https://github.com/alinex/node-spawn" title="Fork me XXXXXXXXXXXXXXXXXXXX on GitHub"></a><div class="background highlight"></div>
 <table cellpadding="0" cellspacing="0">
   <tbody>
       <tr>
@@ -355,8 +355,8 @@ is strong exponential, meaning higher priorities are higher load values allowed<
         <td class="code highlight"><div class="highlight"><pre>
   <span class="vi">@nice: </span><span class="nf">(p) -&gt;</span>
     <span class="nv">v = </span><span class="k">if</span> <span class="nx">p</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">then</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span><span class="o">-</span><span class="nx">p</span>
-    <span class="nv">max = </span><span class="nx">process</span><span class="p">.</span><span class="nx">getuid</span><span class="p">()</span> <span class="o">?</span> <span class="mi">19</span> <span class="o">:</span> <span class="mi">0</span>
-    <span class="o">~~</span><span class="p">(</span><span class="nx">v</span><span class="o">*</span><span class="p">(</span><span class="nx">max</span><span class="o">+</span><span class="mi">20</span><span class="p">)</span> <span class="o">-</span> <span class="mi">20</span><span class="p">)</span>
+    <span class="nv">min = </span><span class="k">unless</span> <span class="nx">process</span><span class="p">.</span><span class="nx">getuid</span><span class="p">()</span> <span class="k">then</span> <span class="o">-</span><span class="mi">20</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="o">~~</span><span class="p">(</span><span class="nx">v</span><span class="o">*</span><span class="p">(</span><span class="mi">19</span><span class="o">-</span><span class="nx">min</span><span class="p">)</span> <span class="o">+</span> <span class="nx">min</span><span class="p">)</span>
 
 
 </pre></div>
@@ -615,7 +615,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
         <td class="code highlight"><div class="highlight"><pre>
       <span class="vi">@retrycount = </span><span class="mi">0</span>
       <span class="vi">@priority = </span><span class="nx">@config</span><span class="p">.</span><span class="nx">priority</span>
-      <span class="vi">@name = </span><span class="nx">@config</span><span class="p">.</span><span class="nx">name</span> <span class="o">?</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">path</span><span class="p">.</span><span class="nx">basename</span> <span class="nx">@config</span><span class="p">.</span><span class="nx">cmd</span><span class="si">}</span><span class="s"> </span><span class="si">#{</span><span class="p">(</span><span class="nx">@config</span><span class="p">.</span><span class="nx">args</span> <span class="o">?</span> <span class="p">[]).</span><span class="nx">join</span> <span class="s">&#39; &#39;</span><span class="si">}</span><span class="s">&quot;</span>
+      <span class="vi">@name = </span><span class="nx">@config</span><span class="p">.</span><span class="nx">name</span> <span class="o">?</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">path</span><span class="p">.</span><span class="nx">basename</span> <span class="nx">@config</span><span class="p">.</span><span class="nx">cmd</span><span class="si">}</span><span class="s"> </span><span class="si">#{</span><span class="p">(</span><span class="nx">@config</span><span class="p">.</span><span class="nx">args</span> <span class="o">?</span> <span class="p">[]).</span><span class="nx">join</span> <span class="s">&#39; &#39;</span><span class="si">}</span><span class="s">&quot;</span><span class="p">.</span><span class="nx">trim</span><span class="p">()</span>
       <span class="nx">@_run</span> <span class="nx">cb</span>
 
   <span class="nv">_run: </span><span class="nf">(cb) -&gt;</span>
@@ -695,7 +695,6 @@ is strong exponential, meaning higher priorities are higher load values allowed<
         <span class="nv">input: </span><span class="nx">@config</span><span class="p">.</span><span class="nx">input</span>
         <span class="nv">stdio: </span><span class="nx">@config</span><span class="p">.</span><span class="nx">stdio</span>
       <span class="vi">@pid = </span><span class="nx">@proc</span><span class="p">.</span><span class="nx">pid</span>
-      <span class="nx">debugCmd</span> <span class="s">&quot;[</span><span class="si">#{</span><span class="nx">@pid</span><span class="si">}</span><span class="s">] </span><span class="si">#{</span><span class="nx">@config</span><span class="p">.</span><span class="nx">cmd</span><span class="si">}</span><span class="s"> </span><span class="si">#{</span><span class="p">(</span><span class="nx">@config</span><span class="p">.</span><span class="nx">args</span> <span class="o">?</span> <span class="p">[]).</span><span class="nx">join</span> <span class="s">&#39; &#39;</span><span class="si">}</span><span class="s">&quot;</span>
 
 </pre></div>
         </td>
@@ -704,6 +703,27 @@ is strong exponential, meaning higher priorities are higher load values allowed<
         <td class="docs">
 <div class="pilwrap">
   <a class="pilcrow" href="#section-36" id="section-36">&#182;</a>
+</div>
+<p>output debug line</p>
+        </td>
+        <td class="code highlight"><div class="highlight"><pre>
+      <span class="nv">cmdline = </span><span class="s">&quot;[</span><span class="si">#{</span><span class="nx">@pid</span><span class="si">}</span><span class="s">] </span><span class="si">#{</span><span class="nx">cmd</span><span class="si">}</span><span class="s">&quot;</span>
+      <span class="k">for</span> <span class="nx">n</span><span class="p">,</span><span class="nx">e</span> <span class="k">of</span> <span class="nx">@config</span><span class="p">.</span><span class="nx">env</span>
+        <span class="nx">cmdline</span> <span class="o">+=</span> <span class="s">&quot; </span><span class="si">#{</span><span class="nx">n</span><span class="si">}</span><span class="s">=</span><span class="si">#{</span><span class="nx">e</span><span class="si">}</span><span class="s">&quot;</span>
+      <span class="k">for</span> <span class="nx">a</span> <span class="k">in</span> <span class="nx">args</span>
+        <span class="k">if</span> <span class="k">typeof</span> <span class="nx">a</span> <span class="o">is</span> <span class="s">&#39;string&#39;</span>
+          <span class="nx">cmdline</span> <span class="o">+=</span> <span class="s">&quot; </span><span class="si">#{</span><span class="nx">a</span><span class="p">.</span><span class="nx">replace</span> <span class="sr">/[ ]/</span><span class="p">,</span> <span class="s">&#39;\ &#39;</span><span class="si">}</span><span class="s">&quot;</span>
+        <span class="k">else</span>
+          <span class="nx">cmdline</span> <span class="o">+=</span> <span class="s">&quot; </span><span class="si">#{</span><span class="nx">a</span><span class="si">}</span><span class="s">&quot;</span>
+      <span class="nx">debugCmd</span> <span class="nx">cmdline</span>
+
+</pre></div>
+        </td>
+      </tr>
+      <tr>
+        <td class="docs">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-37" id="section-37">&#182;</a>
 </div>
 <p>collect output</p>
         </td>
@@ -726,7 +746,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-37" id="section-37">&#182;</a>
+  <a class="pilcrow" href="#section-38" id="section-38">&#182;</a>
 </div>
 <p>error management</p>
         </td>
@@ -745,7 +765,7 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-38" id="section-38">&#182;</a>
+  <a class="pilcrow" href="#section-39" id="section-39">&#182;</a>
 </div>
 <p>process finished</p>
         </td>
@@ -791,12 +811,14 @@ is strong exponential, meaning higher priorities are higher load values allowed<
       <tr>
         <td class="docs">
 <div class="pilwrap">
-  <a class="pilcrow" href="#section-40" id="section-40">&#182;</a>
+  <a class="pilcrow" href="#section-41" id="section-41">&#182;</a>
 </div>
 <p>end of retries</p>
         </td>
         <td class="code highlight"><div class="highlight"><pre>
     <span class="nx">@emit</span> <span class="s">&#39;fail&#39;</span><span class="p">,</span> <span class="nx">@error</span>
+    <span class="k">if</span> <span class="nx">@retrycount</span>
+      <span class="vi">@error.message = </span><span class="nx">@error</span><span class="p">.</span><span class="nx">message</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\.\s*$/</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; (after </span><span class="si">#{</span><span class="nx">@retrycount</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s"> tries).&quot;</span>
     <span class="nx">debug</span> <span class="nx">chalk</span><span class="p">.</span><span class="nx">red</span> <span class="s">&quot;[</span><span class="si">#{</span><span class="nx">@pid</span><span class="si">}</span><span class="s">] </span><span class="si">#{</span><span class="nx">@error</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span><span class="si">}</span><span class="s">&quot;</span>
     <span class="nx">cb</span> <span class="nx">@error</span><span class="p">,</span> <span class="nx">@stdout</span><span class="p">,</span> <span class="nx">@stderr</span><span class="p">,</span> <span class="nx">@code</span> <span class="k">if</span> <span class="nx">cb</span>
 
