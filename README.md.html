@@ -94,7 +94,7 @@
     </div>
   </div>
   <div id="sidebar-toggle"></div>
-  <div id="container"><a id="fork" href="https://github.com/alinex/node-spawn" title="Fork me on GitHub"></a><div class="docs markdown">
+  <div id="container" tabindex="0"><a id="fork" href="https://github.com/alinex/node-spawn" title="Fork me XXXXXXXXXXXXXXXXXXXX on GitHub"></a><div class="docs markdown">
 <div class="pilwrap" id="package%3A%20alinex-spawn">
   <h1>
     <a href="#package%3A%20alinex-spawn" name="package%3A%20alinex-spawn" class="pilcrow">&#182;</a>
@@ -104,7 +104,6 @@
 
 
 <p><a href="https://travis-ci.org/alinex/node-spawn"><img src="https://travis-ci.org/alinex/node-spawn.svg?branch=master" alt="Build Status" title="" /></a>
-<a href="https://coveralls.io/r/alinex/node-spawn?branch=master"><img src="https://coveralls.io/repos/alinex/node-spawn/badge.png?branch=master" alt="Coverage Status" title="" /></a>
 <a href="https://gemnasium.com/alinex/node-spawn"><img src="https://gemnasium.com/alinex/node-spawn.png" alt="Dependency Status" title="" /></a></p>
 
 <p>This is an object oriented implementation around the core <code>process.spawn</code>
@@ -133,7 +132,7 @@ following the code standards defined there.</p>
 <p>The easiest way is to let npm add the module directly:</p>
 
 
-<div class="highlight"><pre><code><span class="o">&gt;</span> <span class="nx">npm</span> <span class="nx">install</span> <span class="nx">alinex</span><span class="o">-</span><span class="nx">spawn</span> <span class="o">--</span><span class="nx">save</span>
+<div class="highlight"><pre><code>npm install alinex-spawn --save
 </code></pre></div>
 
 
@@ -155,8 +154,8 @@ use the events.</p>
 <p>First you have to load the class package.</p>
 
 
-<div class="highlight"><pre><code><span class="nx">Spawn</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;alinex-spawn&#39;</span><span class="p">);</span>
-<span class="nx">Spawn</span><span class="p">.</span><span class="nx">init</span><span class="p">();</span> <span class="err">#</span> <span class="nx">optional</span> <span class="nx">loading</span> <span class="nx">spawn</span><span class="p">...</span> <span class="nx">config</span>
+<div class="highlight"><pre><code><span class="nv">Spawn = </span><span class="nx">require</span> <span class="s">&#39;alinex-spawn&#39;</span>
+<span class="nx">Spawn</span><span class="p">.</span><span class="nx">init</span><span class="p">()</span> <span class="c1"># optional loading spawn... config</span>
 </code></pre></div>
 
 
@@ -164,7 +163,7 @@ use the events.</p>
 <p>You may also load a specific configuration like:</p>
 
 
-<div class="highlight"><pre><code><span class="nx">Spawn</span><span class="p">.</span><span class="nx">init</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">);</span>
+<div class="highlight"><pre><code><span class="nx">Spawn</span><span class="p">.</span><span class="nx">init</span> <span class="s">&#39;spawn&#39;</span>
 </code></pre></div>
 
 
@@ -172,9 +171,8 @@ use the events.</p>
 <p>Now you may setup an external process like:</p>
 
 
-<div class="highlight"><pre><code><span class="nx">proc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Spawn</span> <span class="p">{</span>
-  <span class="nx">cmd</span><span class="o">:</span> <span class="s1">&#39;date&#39;</span>
-<span class="p">};</span>
+<div class="highlight"><pre><code><span class="nv">proc = </span><span class="k">new</span> <span class="nx">Spawn</span>
+  <span class="nv">cmd: </span><span class="s">&#39;date&#39;</span>
 </code></pre></div>
 
 
@@ -182,7 +180,7 @@ use the events.</p>
 <p>You may also change the configuration afterwards like:</p>
 
 
-<div class="highlight"><pre><code><span class="nx">proc</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">cmd</span> <span class="o">=</span> <span class="s1">&#39;date&#39;</span><span class="p">;</span>
+<div class="highlight"><pre><code><span class="nv">proc.config.cmd = </span><span class="s">&#39;date&#39;</span>
 </code></pre></div>
 
 
@@ -201,9 +199,8 @@ use the events.</p>
 <p>To run this simple process call the run-method:</p>
 
 
-<div class="highlight"><pre><code><span class="nx">proc</span><span class="p">.</span><span class="nx">run</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">stdout</span><span class="p">,</span> <span class="nx">stderr</span><span class="p">,</span> <span class="nx">code</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// work with the results</span>
-<span class="p">});</span>
+<div class="highlight"><pre><code><span class="nx">proc</span><span class="p">.</span><span class="nx">run</span> <span class="nf">(err, stdout, stderr, code) -&gt;</span>
+  <span class="c1"># work with the results</span>
 </code></pre></div>
 
 
@@ -223,16 +220,13 @@ most used data. But you may access all details through the <code>proc</code> obj
 <p>With events you can monitor what's going on while the process works.</p>
 
 
-<div class="highlight"><pre><code><span class="nx">proc</span><span class="p">.</span><span class="nx">run</span><span class="p">();</span>
+<div class="highlight"><pre><code><span class="nx">proc</span><span class="p">.</span><span class="nx">run</span><span class="p">()</span>
 
-<span class="nx">stdout</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
-<span class="nx">proc</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;stdout&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="nx">stdout</span> <span class="o">+=</span> <span class="nx">data</span><span class="p">;</span>
-<span class="p">});</span>
-
-<span class="nx">proc</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;done&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="c1">// analyse the results</span>
-<span class="p">});</span>
+<span class="nv">stdout = </span><span class="s">&#39;&#39;</span>
+<span class="nx">proc</span><span class="p">.</span><span class="nx">on</span> <span class="s">&#39;stdout&#39;</span><span class="p">,</span> <span class="nf">(data) -&gt;</span>
+  <span class="nx">stdout</span> <span class="o">+=</span> <span class="nx">data</span>
+<span class="nx">proc</span><span class="p">.</span><span class="nx">on</span> <span class="s">&#39;done&#39;</span><span class="p">,</span> <span class="nf">-&gt;</span>
+  <span class="c1"># analyse the results</span>
 </code></pre></div>
 
 
@@ -254,11 +248,8 @@ the output will be generated.</p>
 check whether the process succeeded and return an Error or undefined:</p>
 
 
-<div class="highlight"><pre><code><span class="nx">proc</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">check</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">proc</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">((</span><span class="nx">proc</span><span class="p">.</span><span class="nx">code</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">code</span> <span class="o">===</span> <span class="mi">0</span><span class="p">))</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;Got exit code of &quot;</span> <span class="o">+</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">code</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">};</span>
+<div class="highlight"><pre><code><span class="nv">proc.config.check = </span><span class="nf">(proc) -&gt;</span>
+  <span class="k">return</span> <span class="k">new</span> <span class="nb">Error</span> <span class="s">&quot;Got exit code of </span><span class="si">#{</span><span class="nx">proc</span><span class="p">.</span><span class="nx">code</span><span class="si">}</span><span class="s">&quot;</span> <span class="k">if</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">code</span>
 </code></pre></div>
 
 
@@ -266,13 +257,10 @@ check whether the process succeeded and return an Error or undefined:</p>
 <p>You may also make some ḱind of filter which specifies some known errors:</p>
 
 
-<div class="highlight"><pre><code><span class="nx">proc</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">check</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">proc</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">proc</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/Error: Unknown file type/</span><span class="p">))</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="err">#</span> <span class="k">else</span> <span class="nx">use</span> <span class="nx">general</span> <span class="nx">check</span>
-  <span class="k">return</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">constructor</span><span class="p">.</span><span class="nx">check</span><span class="p">(</span><span class="nx">proc</span><span class="p">);</span>
-<span class="p">};</span>
+<div class="highlight"><pre><code><span class="nv">proc.config.check = </span><span class="nf">(proc) -&gt;</span>
+  <span class="k">return</span> <span class="k">if</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">match</span> <span class="sr">/Error: Unknown file type/</span>
+  <span class="c1"># else use general check</span>
+  <span class="k">return</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">constructor</span><span class="p">.</span><span class="nx">check</span> <span class="nx">proc</span>
 </code></pre></div>
 
 
@@ -281,9 +269,8 @@ check whether the process succeeded and return an Error or undefined:</p>
 know if it got an error you can use the event or callback value or check for:</p>
 
 
-<div class="highlight"><pre><code><span class="k">if</span> <span class="p">(</span><span class="nx">proc</span><span class="p">.</span><span class="nx">error</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// something went wrong</span>
-<span class="p">}</span>
+<div class="highlight"><pre><code><span class="k">if</span> <span class="nx">proc</span><span class="p">.</span><span class="nx">error</span>
+  <span class="c1"># something went wrong</span>
 </code></pre></div>
 
 
@@ -310,7 +297,7 @@ didn't failed.</p>
 <p>To disable retrying use the configuration:</p>
 
 
-<div class="highlight"><pre><code><span class="nx">proc</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">retry</span> <span class="o">=</span> <span class="mi">0</span>
+<div class="highlight"><pre><code><span class="nv">proc.config.retry = </span><span class="mi">0</span>
 </code></pre></div>
 
 
@@ -327,18 +314,23 @@ didn't failed.</p>
 <p>You don't have to do anything for load handling, it comes out of the box but you
 may customize it for your machine in the configuration file.</p>
 
-<p>You may also add specific settings dynamically after loading
-    # This maybe changed per machine.
-    Spawn.LOAD = 1   # limit system load (limit will be between 0.8<em>LOAD and 4</em>LOAD)
-    Spawn.WAIT = 10  # wait between WAIT seconds and WAIT minutes + queue size</p>
+<p>You may also add specific settings dynamically after loading</p>
+
+
+<div class="highlight"><pre><code><span class="c1"># This maybe changed per machine.</span>
+<span class="nv">Spawn.LOAD = </span><span class="mi">1</span>   <span class="c1"># limit system load (limit will be between 0.8*LOAD and 4*LOAD)</span>
+<span class="nv">Spawn.WAIT = </span><span class="mi">10</span>  <span class="c1"># wait between WAIT seconds and WAIT minutes + queue size</span>
+</code></pre></div>
+
+
 
 <p>See the detailed explanation below to see what each value means. Also you may
 specify what the limit of processes for each start period will be.</p>
 
 
-<div class="highlight"><pre><code><span class="err">#</span> <span class="nx">The</span> <span class="nx">weight</span> <span class="nx">which</span> <span class="nx">can</span> <span class="nx">be</span> <span class="nx">started</span> <span class="nx">per</span> <span class="nx">each</span> <span class="nx">start</span> <span class="nx">period</span>
-<span class="nx">Spawn</span><span class="p">.</span><span class="nx">WEIGHTTIME</span> <span class="o">=</span> <span class="mi">10</span>   <span class="err">#</span> <span class="nx">time</span> <span class="k">for</span> <span class="nx">each</span> <span class="nx">period</span> <span class="k">in</span> <span class="nx">seconds</span>
-<span class="nx">Spawn</span><span class="p">.</span><span class="nx">WEIGHTLIMIT</span> <span class="o">=</span> <span class="mi">10</span>  <span class="err">#</span> <span class="nx">size</span> <span class="nx">of</span> <span class="nx">load</span> <span class="nx">allowed</span> <span class="k">for</span> <span class="nx">each</span> <span class="nx">period</span>
+<div class="highlight"><pre><code><span class="c1"># The weight which can be started per each start period</span>
+<span class="nv">Spawn.WEIGHTTIME = </span><span class="mi">10</span>   <span class="c1"># time for each period in seconds</span>
+<span class="nv">Spawn.WEIGHTLIMIT = </span><span class="mi">10</span>  <span class="c1"># size of load allowed for each period</span>
 </code></pre></div>
 
 
@@ -347,8 +339,8 @@ specify what the limit of processes for each start period will be.</p>
 giving each command a specific weight. Some default commands are already defined.</p>
 
 
-<div class="highlight"><pre><code><span class="err">#</span> <span class="nx">Specific</span> <span class="nx">weights</span> <span class="k">for</span> <span class="nx">each</span> <span class="nx">command</span>
-<span class="nx">Spawn</span><span class="p">.</span><span class="nx">WEIGHT</span><span class="p">.</span><span class="nx">SITMarkAVMulticontainerFFmpeg</span> <span class="o">=</span> <span class="mi">500</span>
+<div class="highlight"><pre><code><span class="c1"># Specific weights for each command</span>
+<span class="nv">Spawn.WEIGHT.SITMarkAVMulticontainerFFmpeg = </span><span class="mi">500</span>
 </code></pre></div>
 
 
@@ -411,7 +403,7 @@ value the load as displayed in the <code>top</code> command will be harmonized b
 it through the number of cpu cores.</p>
 
 
-<div class="highlight"><pre><code><span class="nx">load</span> <span class="o">=</span> <span class="kr">short</span><span class="o">-</span><span class="nx">load</span> <span class="o">/</span> <span class="nx">num</span><span class="o">-</span><span class="nx">cpus</span>
+<div class="highlight"><pre><code><span class="nv">load = </span><span class="nx">short</span><span class="o">-</span><span class="nx">load</span> <span class="o">/</span> <span class="nx">num</span><span class="o">-</span><span class="nx">cpus</span>
 </code></pre></div>
 
 
@@ -554,11 +546,10 @@ normal system process (nice=0).</p>
 
 <ul>
 <li><code>config</code> (object) - configuration settings for the machine</li>
-<li><code>configClass</code> (Config) - alinex-config instance which loaded the configuration</li>
-<li><code>initDone</code> (boolean) - flag indication the class is initialized</li>
 <li><code>time</code> (integer) - current time period</li>
 <li><code>weight</code> (float) - already used weight in this time period</li>
 <li><code>queue</code> (integer) - number of processes in queue</li>
+<li><code>checkExitCode()</code> - predefined function to use for instances</li>
 </ul>
 
 
@@ -615,11 +606,14 @@ again.</p>
 <li>uid (integer) - user identity of the process</li>
 <li>gid (integer) - group identity of the process</li>
 <li>check (function) - to check whether process succeeded</li>
+<li>balance (boolean) - set to true to use server load balancing</li>
 <li>priority (float) - between 0..1</li>
-<li>retry (integer) - number of possible retries</li></ul></li>
+<li>retry (integer) - number of possible retries</li>
+<li>stdout - function to get stdout line by line</li>
+<li>stderr - function to get stderr line by line</li></ul></li>
 </ul>
 
-<p>Runtime data</p>
+<p><strong>Runtime data</strong></p>
 
 <ul>
 <li><code>name</code> - descriptive name of the process</li>
@@ -643,7 +637,7 @@ again.</p>
 
 
 <ul>
-<li><code>error</code> (object) - if an error occurred</li>
+<li><code>fail</code> (object) - if an error occurred</li>
 <li><code>stdout</code> (string) - if a line is outputted</li>
 <li><code>stderr</code> (string) - if a error line is outputted</li>
 <li><code>done</code> (integer) - if the process finished giving exit code</li>
