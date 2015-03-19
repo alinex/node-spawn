@@ -129,11 +129,15 @@ time (time=retry ^ 3):
 |   3   |     27s |   36s |
 |   4   |     64s |  100s |
 |   5   |      2m |    4m |
-|   6   |      3m |    7m |
+|   6   |      4m |    7m |
 |   7   |      6m |   13m |
-|   8   |      9m |   21m |
-|   9   |     12m |   33m |
+|   8   |      9m |   22m |
+|   9   |     12m |   34m |
 |  10   |     17m |   50m |
+|  11   |     22m |   73m |
+|  12   |     29m |  101m |
+
+![Retry Timeout](src/doc/graph-retry.png)
 
 On each retry the priority will go down giving in favor for other jobs which
 didn't failed.
@@ -219,19 +223,18 @@ So a load of 1 meaning every core has to do enough in the moment, but a system
 may also have more things to do (meaning they are in the system's queue) as the
 ones just being processed.
 
-| LOAD | prio 0..1 | quad-core load | comment for setting |
-|------|-----------|----------------|---------------------|
-|  0.2 | 0.2 - 0.8 | 0.6 -  3.2 | neither implies the system |
-|  0.5 | 0.4 - 2.0 | 1.6 - 10.0 | minor priority service |
-|  0.8 | 0.6 - 3.2 | 2.6 - 12.8 | customer system |
-|   1  | 0.8 - 4.0 | 3.6 - 20.0 | best performance (default) |
-|  1.5 | 1.2 - 6.0 | 4.8 - 24.0 | if peaks are short |
-|   2  | 1.6 - 8.0 | 6.4 - 32.0 | fast but may overload |
-|   5  | 4.0 - 20.0 | 16.0 - 80.0 | maintenance services only |
+| LOAD | prio 0..1  | quad-core load |     comment for setting    |
+|------|------------|----------------|----------------------------|
+|  0.2 | 0.2 -  0.8 |     0.6 -  3.2 | neither implies the system |
+|  0.5 | 0.4 -  2.0 |     1.6 - 10.0 | minor priority service     |
+|  0.8 | 0.6 -  3.2 |     2.6 - 12.8 | customer system            |
+|   1  | 0.8 -  4.0 |     3.6 - 20.0 | best performance (default) |
+|  1.5 | 1.2 -  6.0 |     4.8 - 24.0 | if peaks are short         |
+|   2  | 1.6 -  8.0 |     6.4 - 32.0 | fast but may overload      |
+|   5  | 4.0 - 20.0 |    16.0 - 80.0 | maintenance services only  |
 
 As you see the correct setting depends on what purpose the machine has, what
 else runs on that machine and the priority of the service itself.
-
 
 ![Load Limit](src/doc/graph-load.png)
 

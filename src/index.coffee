@@ -73,7 +73,7 @@ class Spawn extends EventEmitter
     (59 * (1 - p) + 1) * @config.load.wait / q
 
   # ### Retry timeout
-  @retrytimeout: (p, count) -> Math.pow(count, 2) * 1000
+  @retrytimeout: (p, count) -> Math.pow(count, 3) * 1000
 
   # ### Nice value
   # This brings the priorities to the operating system
