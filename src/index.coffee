@@ -242,6 +242,8 @@ class Spawn extends EventEmitter
       return setTimeout (=> @_run cb), wait
     # end of retries
     @emit 'fail', @error
+    if @retrycount
+      @error.message = @error.message.replace(/\.\s*$/, '') + " (after #{@retrycount+1} tries)."
     debug chalk.red "[#{@pid}] #{@error.toString()}"
     cb @error, @stdout, @stderr, @code if cb
 
