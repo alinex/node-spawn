@@ -4,6 +4,10 @@ Version changes
 The following list gives a short overview about what is changed between
 individual versions:
 
+Version 1.0.1 (2015-03-19)
+-------------------------------------------------
+- Allow to change configsearch path.
+
 Version 1.0.0 (2015-03-19)
 -------------------------------------------------
 - Make tests faster by checking only two retries.
