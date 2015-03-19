@@ -6,7 +6,7 @@
   <link rel="stylesheet" media="all" href="../doc-style.css" />
   <script src="../doc-filelist.js"></script>
   <script>
-    var relativeDir = "../", thisFile = "home/alex/a3/node-spawn/src/indexcoffee", defaultSidebar = true;
+    var relativeDir = "../", thisFile = "home/alex/a3/node-spawn/src/index.coffee", defaultSidebar = true;
   </script>
   <script src="../doc-script.js"></script>
   <script src="../fileSearch.js"></script>
@@ -184,6 +184,11 @@ command.</p>
         <td class="code highlight"><div class="highlight"><pre>
 <span class="k">class</span> <span class="nx">Spawn</span> <span class="k">extends</span> <span class="nx">EventEmitter</span>
 
+  <span class="vi">@configsearch: </span><span class="p">[</span>
+    <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">path</span><span class="p">.</span><span class="nx">dirname</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">),</span> <span class="s">&#39;var/src/config&#39;</span>
+    <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">path</span><span class="p">.</span><span class="nx">dirname</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">),</span> <span class="s">&#39;var/local/config&#39;</span>
+  <span class="p">]</span>
+
   <span class="vi">@init: </span><span class="nf">(config = &#39;spawn&#39;, cb) -&gt;</span>
     <span class="k">return</span> <span class="nx">cb</span><span class="o">?</span><span class="p">()</span> <span class="k">if</span> <span class="nx">@config</span> <span class="c1"># already loaded</span>
     <span class="nx">@_configSource</span> <span class="o">?=</span> <span class="nx">config</span> <span class="c1"># store what to load</span>
@@ -199,10 +204,7 @@ command.</p>
 <p>start resolving configuration</p>
         </td>
         <td class="code highlight"><div class="highlight"><pre>
-    <span class="nx">Config</span><span class="p">.</span><span class="nx">get</span> <span class="nx">@_configSource</span><span class="p">,</span> <span class="p">[</span>
-      <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">path</span><span class="p">.</span><span class="nx">dirname</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">),</span> <span class="s">&#39;var/src/config&#39;</span>
-      <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span> <span class="nx">path</span><span class="p">.</span><span class="nx">dirname</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">),</span> <span class="s">&#39;var/local/config&#39;</span>
-    <span class="p">],</span> <span class="nx">configcheck</span><span class="p">,</span> <span class="nf">(err, @config) =&gt;</span>
+    <span class="nx">Config</span><span class="p">.</span><span class="nx">get</span> <span class="nx">@_configSource</span><span class="p">,</span> <span class="nx">@configsearch</span><span class="p">,</span> <span class="nx">configcheck</span><span class="p">,</span> <span class="nf">(err, @config) =&gt;</span>
 
 </pre></div>
         </td>
