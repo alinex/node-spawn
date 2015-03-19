@@ -4,6 +4,12 @@ Version changes
 The following list gives a short overview about what is changed between
 individual versions:
 
+Version 1.0.2 (2015-03-19)
+-------------------------------------------------
+- Optimized debug of command line with environment and encoding.
+- Fixed nice values.
+- Adding hint for multiple runs to error message.
+
 Version 1.0.1 (2015-03-19)
 -------------------------------------------------
 - Allow to change configsearch path.
