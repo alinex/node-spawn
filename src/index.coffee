@@ -81,8 +81,8 @@ class Spawn extends EventEmitter
   # This brings the priorities to the operating system
   @nice: (p) ->
     v = if p > 1 then 0 else 1-p
-    max = process.getuid() ? 19 : 0
-    ~~(v*(max+20) - 20)
+    min = unless process.getuid() then -20 else 0
+    ~~(v*(19-min) + min)
 
   # ### General check methods
 
@@ -162,7 +162,7 @@ class Spawn extends EventEmitter
       # init internal variables
       @retrycount = 0
       @priority = @config.priority
-      @name = @config.name ? "#{path.basename @config.cmd} #{(@config.args ? []).join ' '}"
+      @name = @config.name ? "#{path.basename @config.cmd} #{(@config.args ? []).join ' '}".trim()
       @_run cb
 
   _run: (cb) ->
@@ -199,6 +199,7 @@ class Spawn extends EventEmitter
         stdio: @config.stdio
       @pid = @proc.pid
       debugCmd "[#{@pid}] #{@config.cmd} #{(@config.args ? []).join ' '}"
+      debugCmd "[#{@pid}] #{cmd} #{(args ? []).join ' '}"
       # collect output
       stdout = stderr = ''
       carrier.carry @proc.stdout, (line) =>
