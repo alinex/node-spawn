@@ -296,6 +296,21 @@ set appropriate to it's priority. That allows the operating system to give the
 processes different amount of cpu time. The range goes from 5% to 200% of the
 normal system process (nice=0).
 
+### Real life load
+
+The following chart shows a test measurement on a server while running a high
+load of audio conversion jobs.
+
+![CPU graph](src/doc/cpu-load-test.png)
+
+This shows how the system will react based on the load. A high CPU usage over
+longer time will cause a high load (but also from high IO). So no new processes
+are started. The running ones end and the load of the system goes slowly down
+while the current CPU usage is already down. Then the load is low new processes
+are started and the CPU usage will directly jump up.
+
+But the whole time the system keeps running and being responsive.
+
 
 API
 -------------------------------------------------
