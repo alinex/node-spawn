@@ -32,14 +32,16 @@ ERRORDETECT = /Error:\s((\w| )+)/i
 # -------------------------------------------------
 class Spawn extends EventEmitter
 
+  @configsearch: [
+    path.resolve path.dirname(__dirname), 'var/src/config'
+    path.resolve path.dirname(__dirname), 'var/local/config'
+  ]
+
   @init: (config = 'spawn', cb) ->
     return cb?() if @config # already loaded
     @_configSource ?= config # store what to load
     # start resolving configuration
-    Config.get @_configSource, [
-      path.resolve path.dirname(__dirname), 'var/src/config'
-      path.resolve path.dirname(__dirname), 'var/local/config'
-    ], configcheck, (err, @config) =>
+    Config.get @_configSource, @configsearch, configcheck, (err, @config) =>
       # results stored, now check for errors
       console.error err if err
       cb err if cb?

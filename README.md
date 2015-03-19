@@ -307,6 +307,7 @@ API
 ### Class variables
 
 - `config` (object) - configuration settings for the machine
+- `configsearch` - list of paths to search for config files
 - `time` (integer) - current time period
 - `weight` (float) - already used weight in this time period
 - `queue` (integer) - number of processes in queue
