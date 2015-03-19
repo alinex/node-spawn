@@ -198,8 +198,16 @@ class Spawn extends EventEmitter
         input: @config.input
         stdio: @config.stdio
       @pid = @proc.pid
-      debugCmd "[#{@pid}] #{@config.cmd} #{(@config.args ? []).join ' '}"
-      debugCmd "[#{@pid}] #{cmd} #{(args ? []).join ' '}"
+      # output debug line
+      cmdline = "[#{@pid}] #{cmd}"
+      for n,e of @config.env
+        cmdline += " #{n}=#{e}"
+      for a in args
+        if typeof a is 'string'
+          cmdline += " #{a.replace /[ ]/, '\ '}"
+        else
+          cmdline += " #{a}"
+      debugCmd cmdline
       # collect output
       stdout = stderr = ''
       carrier.carry @proc.stdout, (line) =>
