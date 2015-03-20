@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "alinex-config": "0.4.x",
-    "carrier": "0.1.x",
+    "carrier": "0.1.x || 0.2.x",
     "chalk": "1.x",
     "debug": "2.x"
   },
