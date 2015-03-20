@@ -4,6 +4,10 @@ Version changes
 The following list gives a short overview about what is changed between
 individual versions:
 
+Version 1.0.3 (2015-03-20)
+-------------------------------------------------
+- Added example cpu graph to documentation.
+
 Version 1.0.2 (2015-03-19)
 -------------------------------------------------
 - Optimized debug of command line with environment and encoding.
