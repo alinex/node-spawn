@@ -6,7 +6,7 @@
   <link rel="stylesheet" media="all" href="doc-style.css" />
   <script src="doc-filelist.js"></script>
   <script>
-    var relativeDir = "", thisFile = "home/alex/a3/node-spawn/READMEmd", defaultSidebar = true;
+    var relativeDir = "", thisFile = "home/alex/a3/node-spawn/README.md", defaultSidebar = true;
   </script>
   <script src="doc-script.js"></script>
   <script src="fileSearch.js"></script>
@@ -64,6 +64,9 @@
       <div class="heading h3">
         <a href="#os%20priorities">OS Priorities</a>
       </div>
+      <div class="heading h3">
+        <a href="#real%20life%20load">Real life load</a>
+      </div>
       <div class="heading h2">
         <a href="#api">API</a>
       </div>
@@ -94,7 +97,7 @@
     </div>
   </div>
   <div id="sidebar-toggle"></div>
-  <div id="container" tabindex="0"><a id="fork" href="https://github.com/alinex/node-spawn" title="Fork me XXXXXXXXXXXXXXXXXXXX on GitHub"></a><div class="docs markdown">
+  <div id="container" tabindex="0"><a id="fork" href="https://github.com/alinex/node-spawn" title="Fork me on GitHub"></a><div class="docs markdown">
 <div class="pilwrap" id="package%3A%20alinex-spawn">
   <h1>
     <a href="#package%3A%20alinex-spawn" name="package%3A%20alinex-spawn" class="pilcrow">&#182;</a>
@@ -278,7 +281,7 @@ know if it got an error you can use the event or callback value or check for:</p
 <p>If a check went wrong the process will be scheduled for retry after the following
 time (time=retry ^ 3):</p>
 
-<p>| Retry | Timeout | Total |
+<p style="font-family:monospace;white-space:pre">| Retry | Timeout | Total |
 |-------|---------|-------|
 |   1   |      1s |    1s |
 |   2   |      8s |    9s |
@@ -416,7 +419,7 @@ it through the number of cpu cores.</p>
 may also have more things to do (meaning they are in the system's queue) as the
 ones just being processed.</p>
 
-<p>| LOAD | prio 0..1  | quad-core load |     comment for setting    |
+<p style="font-family:monospace;white-space:pre">| LOAD | prio 0..1  | quad-core load |     comment for setting    |
 |------|------------|----------------|----------------------------|
 |  0.2 | 0.2 -  0.8 |     0.6 -  3.2 | neither implies the system |
 |  0.5 | 0.4 -  2.0 |     1.6 - 10.0 | minor priority service     |
@@ -516,6 +519,28 @@ operating system if already running. Therefore the nice-value of each process is
 set appropriate to it's priority. That allows the operating system to give the
 processes different amount of cpu time. The range goes from 5% to 200% of the
 normal system process (nice=0).</p>
+
+
+<div class="pilwrap" id="real%20life%20load">
+  <h3>
+    <a href="#real%20life%20load" name="real%20life%20load" class="pilcrow">&#182;</a>
+    Real life load
+  </h3>
+</div>
+
+
+<p>The following chart shows a test measurement on a server while running a high
+load of audio conversion jobs.</p>
+
+<p><img src="src/doc/cpu-load-test.png" alt="CPU graph" title="" /></p>
+
+<p>This shows how the system will react based on the load. A high CPU usage over
+longer time will cause a high load (but also from high IO). So no new processes
+are started. The running ones end and the load of the system goes slowly down
+while the current CPU usage is already down. Then the load is low new processes
+are started and the CPU usage will directly jump up.</p>
+
+<p>But the whole time the system keeps running and being responsive.</p>
 
 
 <div class="pilwrap" id="api">
