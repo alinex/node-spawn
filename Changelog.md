@@ -4,6 +4,14 @@ Version changes
 The following list gives a short overview about what is changed between
 individual versions:
 
+Version 1.0.4 (2015-03-24)
+-------------------------------------------------
+- Fixed regexp for line separators.
+- Reverted carrier module to 0.1.x
+- Transform \r and \r\n also into \n making progress bars to output constantly as multiple lines.
+- Fixed debug message of cmdline.
+- Update carrier submodule.
+
 Version 1.0.3 (2015-03-20)
 -------------------------------------------------
 - Added example cpu graph to documentation.
