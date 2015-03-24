@@ -6,7 +6,7 @@
   <link rel="stylesheet" media="all" href="../doc-style.css" />
   <script src="../doc-filelist.js"></script>
   <script>
-    var relativeDir = "../", thisFile = "home/alex/a3/node-spawn/src/index.coffee", defaultSidebar = true;
+    var relativeDir = "../", thisFile = "home/alex/a3//src/index.coffee", defaultSidebar = true;
   </script>
   <script src="../doc-script.js"></script>
   <script src="../fileSearch.js"></script>
@@ -707,9 +707,10 @@ is strong exponential, meaning higher priorities are higher load values allowed<
 <p>output debug line</p>
         </td>
         <td class="code highlight"><div class="highlight"><pre>
-      <span class="nv">cmdline = </span><span class="s">&quot;[</span><span class="si">#{</span><span class="nx">@pid</span><span class="si">}</span><span class="s">] </span><span class="si">#{</span><span class="nx">cmd</span><span class="si">}</span><span class="s">&quot;</span>
+      <span class="nv">cmdline = </span><span class="s">&quot;[</span><span class="si">#{</span><span class="nx">@pid</span><span class="si">}</span><span class="s">] &quot;</span>
       <span class="k">for</span> <span class="nx">n</span><span class="p">,</span><span class="nx">e</span> <span class="k">of</span> <span class="nx">@config</span><span class="p">.</span><span class="nx">env</span>
         <span class="nx">cmdline</span> <span class="o">+=</span> <span class="s">&quot; </span><span class="si">#{</span><span class="nx">n</span><span class="si">}</span><span class="s">=</span><span class="si">#{</span><span class="nx">e</span><span class="si">}</span><span class="s">&quot;</span>
+      <span class="nx">cmdline</span> <span class="o">+=</span> <span class="s">&quot; </span><span class="si">#{</span><span class="nx">cmd</span><span class="si">}</span><span class="s">&quot;</span>
       <span class="k">for</span> <span class="nx">a</span> <span class="k">in</span> <span class="nx">args</span>
         <span class="k">if</span> <span class="k">typeof</span> <span class="nx">a</span> <span class="o">is</span> <span class="s">&#39;string&#39;</span>
           <span class="nx">cmdline</span> <span class="o">+=</span> <span class="s">&quot; </span><span class="si">#{</span><span class="nx">a</span><span class="p">.</span><span class="nx">replace</span> <span class="sr">/[ ]/</span><span class="p">,</span> <span class="s">&#39;\ &#39;</span><span class="si">}</span><span class="s">&quot;</span>
@@ -734,11 +735,13 @@ is strong exponential, meaning higher priorities are higher load values allowed<
         <span class="nx">@emit</span> <span class="s">&#39;stdout&#39;</span><span class="p">,</span> <span class="nx">line</span> <span class="c1"># send through</span>
         <span class="nx">debugOut</span> <span class="nx">chalk</span><span class="p">.</span><span class="nx">grey</span> <span class="s">&quot;[</span><span class="si">#{</span><span class="nx">@pid</span><span class="si">}</span><span class="s">] </span><span class="si">#{</span><span class="nx">line</span><span class="si">}</span><span class="s">&quot;</span>
         <span class="nx">@config</span><span class="p">.</span><span class="nx">stdout</span><span class="o">?</span> <span class="nx">line</span>
+      <span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="sr">/\r?\n|\r(?!\n)/</span> <span class="c1"># match also single \r</span>
       <span class="nx">carrier</span><span class="p">.</span><span class="nx">carry</span> <span class="nx">@proc</span><span class="p">.</span><span class="nx">stderr</span><span class="p">,</span> <span class="nf">(line) =&gt;</span>
         <span class="nx">@stderr</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">#{</span><span class="nx">line</span><span class="si">}</span><span class="s">\n&quot;</span>
         <span class="nx">@emit</span> <span class="s">&#39;stderr&#39;</span><span class="p">,</span> <span class="nx">line</span> <span class="c1"># send through</span>
         <span class="nx">debugErr</span> <span class="nx">chalk</span><span class="p">.</span><span class="nx">grey</span> <span class="s">&quot;[</span><span class="si">#{</span><span class="nx">@pid</span><span class="si">}</span><span class="s">] </span><span class="si">#{</span><span class="nx">line</span><span class="si">}</span><span class="s">&quot;</span>
         <span class="nx">@config</span><span class="p">.</span><span class="nx">stderr</span><span class="o">?</span> <span class="nx">line</span>
+      <span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">,</span> <span class="sr">/\r?\n|\r(?!\n)/</span> <span class="c1"># match also single \r</span>
 
 </pre></div>
         </td>
