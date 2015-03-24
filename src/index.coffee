@@ -199,9 +199,10 @@ class Spawn extends EventEmitter
         stdio: @config.stdio
       @pid = @proc.pid
       # output debug line
-      cmdline = "[#{@pid}] #{cmd}"
+      cmdline = "[#{@pid}] "
       for n,e of @config.env
         cmdline += " #{n}=#{e}"
+      cmdline += " #{cmd}"
       for a in args
         if typeof a is 'string'
           cmdline += " #{a.replace /[ ]/, '\ '}"
