@@ -216,13 +216,13 @@ class Spawn extends EventEmitter
         @emit 'stdout', line # send through
         debugOut chalk.grey "[#{@pid}] #{line}"
         @config.stdout? line
-      , 'utf-8', /\r?\n|\r(?!\n))/ # match also single \r
+      , 'utf-8', /\r?\n|\r(?!\n)/ # match also single \r
       carrier.carry @proc.stderr, (line) =>
         @stderr += "#{line}\n"
         @emit 'stderr', line # send through
         debugErr chalk.grey "[#{@pid}] #{line}"
         @config.stderr? line
-      , 'utf-8', /\r?\n|\r(?!\n))/ # match also single \r
+      , 'utf-8', /\r?\n|\r(?!\n)/ # match also single \r
       # error management
       @proc.on 'error', (@err) =>
         if err.message is 'spawn EMFILE'
