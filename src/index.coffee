@@ -186,10 +186,11 @@ class Spawn extends EventEmitter
       if process.platform is 'linux'
         # add support for nice call
         nice = @constructor.nice @priority
-        args.unshift @config.cmd # command
-        args.unshift @constructor.nice @priority # nice setting
-        args.unshift '-n'
-        cmd = 'nice'
+        if nice
+          args.unshift @config.cmd # command
+          args.unshift @constructor.nice @priority # nice setting
+          args.unshift '-n'
+          cmd = 'nice'
       @proc = spawn cmd, args,
         cwd: @config.cwd
         env: @config.env
