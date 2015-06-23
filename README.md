@@ -1,8 +1,8 @@
 Package: alinex-spawn
 =================================================
 
-[![Build Status] (https://travis-ci.org/alinex/node-spawn.svg?branch=master)](https://travis-ci.org/alinex/node-spawn)
-[![Dependency Status] (https://gemnasium.com/alinex/node-spawn.png)](https://gemnasium.com/alinex/node-spawn)
+[![Build Status](https://travis-ci.org/alinex/node-spawn.svg?branch=master)](https://travis-ci.org/alinex/node-spawn)
+[![Dependency Status](https://gemnasium.com/alinex/node-spawn.png)](https://gemnasium.com/alinex/node-spawn)
 
 This is an object oriented implementation around the core `process.spawn`
 command. It's benefits are:
