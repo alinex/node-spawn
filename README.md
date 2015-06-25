@@ -13,20 +13,31 @@ command. It's benefits are:
 - completely adjustable
 - use priorities (also on OS level)
 
-It is one of the modules of the [Alinex Universe](http://alinex.github.io/node-alinex)
-following the code standards defined there.
+> It is one of the modules of the [Alinex Universe](http://alinex.github.io/code.html)
+> following the code standards defined in the [General Docs](http://alinex.github.io/node-alinex).
 
 
 Install
 -------------------------------------------------
 
-The easiest way is to let npm add the module directly:
+[![NPM](https://nodei.co/npm/alinex-spawn.png?downloads=true&downloadRank=true&stars=true)
+ ![Downloads](https://nodei.co/npm-dl/alinex-spawn.png?months=9&height=3)
+](https://www.npmjs.com/package/alinex-spawn)
+
+The easiest way is to let npm add the module directly to your modules
+(from within you node modules directory):
 
 ``` sh
 npm install alinex-spawn --save
 ```
 
-[![NPM](https://nodei.co/npm/alinex-spawn.png?downloads=true&stars=true)](https://nodei.co/npm/alinex-spawn/)
+And update it to the latest version later:
+
+``` sh
+npm update alinex-spawn --save
+```
+
+Always have a look at the latest [changes](Changelog.md).
 
 
 Usage
