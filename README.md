@@ -4,6 +4,16 @@ Package: alinex-spawn
 [![Build Status](https://travis-ci.org/alinex/node-spawn.svg?branch=master)](https://travis-ci.org/alinex/node-spawn)
 [![Dependency Status](https://gemnasium.com/alinex/node-spawn.png)](https://gemnasium.com/alinex/node-spawn)
 
+---
+
+> ATTENTION!!!
+>
+> This package will no longer be maintained. Please use the
+> [Exec](http://alinex.github.io/node-exec) package as the successor of this
+> package it has the same functions and will grow more powerful the next time.
+
+---
+
 This is an object oriented implementation around the core `process.spawn`
 command. It's benefits are:
 
